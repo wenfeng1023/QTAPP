@@ -3,12 +3,14 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from matplotlib.pyplot import text
 from soupsieve import select
+from .forms import UpdateUserProfileForm,UserUpdateForm
 from .models import *
 from django.db.models import Q
 from django.db.models import IntegerField
 from django.db.models.functions import Cast
 import datetime as dt
 from django.contrib import messages
+import os
 # Create your views here.
 
 
@@ -341,3 +343,31 @@ def bible_hebrew(request):
     else:
         messages.info(request,'오늘 구약 말씀이 아니다.')
         return render(request, 'bible_original.html', {})
+
+
+def login (request):
+    if request.user.is_authenticated:
+        
+        return redirect('setting')
+    else:
+        return render (request,'login.html',{})
+
+def user_profile(request):
+    user = User_Profile.objects.get(user=request.user)
+    old_img = user.profile_img.url
+    if request.method == "POST":
+        u_form = UserUpdateForm(request.POST,instance=request.user)
+        update_form = UpdateUserProfileForm(request.POST,request.FILES,instance=request.user.user_profile)
+        if update_form.is_valid() and u_form.is_valid():
+            if old_img != '/media/img/user.png':
+                os.remove(os.path.join(old_img))
+            update_form.save()
+            return redirect('setting')
+        else:
+            print(update_form.errors)
+    else:
+        update_form = UpdateUserProfileForm(instance=request.user.user_profile)
+        u_form = UserUpdateForm(instance=request.user)
+    
+    context={'update_form': update_form, 'u_form': u_form}
+    return render(request, 'user_profile.html',context)

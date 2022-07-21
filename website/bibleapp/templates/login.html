@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+{%load static%}
+{% block title %}
+<title>Neowine 큐티365</title>
+{% endblock %}
+
+{% block content %}
+<div class="modal-body p-5 pt-0">
+                    <form action="{% provider_login_url 'google' action="reauthenticate"%}" method="post">
+                       {% csrf_token %}
+                       
+                    <button class="w-100 py-2 mb-2 btn btn-outline-secondary rounded-3" type="submit">
+                        
+                        <svg class="bi me-1" width="16" height="16">
+                            <img src="{% static 'img/google.png' %}"></svg>
+                                구글 로그인
+                      
+                    </button>              
+            </form>
+        </div>
+
+            {% endblock %}

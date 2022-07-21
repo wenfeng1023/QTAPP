@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+<title>NEOQT365 </title>
+{% endblock %}
+{% block content %}
+<div class="modal-body p-5 pt-0">
+    <form action="#" method = "POST" enctype='multipart/form-data'>
+        {% csrf_token %}
+        <div id='form-control'>
+            <label>User:</label>
+            {{u_form.username}}
+        </div>
+
+        <div id='form-control'>
+            <label>Email:</label>
+            {{u_form.email}}
+        </div>
+        <div id='form-control'>
+            <label>Nicname:</label>
+            {{update_form.nickname}}
+        </div>
+        <div id='form-control'>
+            <label>Phone:</label>
+            {{update_form.phoneNo}}
+        </div>
+        <div id='form-control'>
+            <label>introduce:</label>
+            {{update_form.self_introduce}}
+        </div>
+
+        
+        <div id='form-control'>
+            <label>picture:</label>
+            {{update_form.profile_img}}
+        </div>
+
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+
+
+
+</div>
+
+
+{%endblock%}

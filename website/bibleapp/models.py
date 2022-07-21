@@ -5,10 +5,10 @@
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
-from attr import field
 from django.db import models
-from matplotlib.pyplot import table
-from matplotlib.style import context
+from django.contrib.auth.models import User
+from django.forms import NullBooleanField
+
 
 
 class AuthGroup(models.Model):
@@ -187,3 +187,20 @@ class korean_title(models.Model):
 
     def __str__(self):
         return self.Book
+
+class User_Profile(models.Model):
+    user = models.OneToOneField(User, null= True, on_delete=models.CASCADE)
+    nickname = models.CharField(max_length=100, blank = True, null= True)
+    phoneNo = models.CharField(max_length=100, blank=True, null=True)
+    self_introduce = models.TextField(blank=True, null=True)
+    profile_img = models.ImageField(upload_to= 'img',blank=True, null=True,default = "img/user.png")
+
+    class Meta:
+        verbose_name = 'user_profile'
+        verbose_name_plural = 'user_profile'
+    
+    def __str__(self):
+        return self.user.username
+    
+
+    
