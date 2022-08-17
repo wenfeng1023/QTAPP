@@ -9,5 +9,12 @@ urlpatterns = [
     path('bible_greek', views.bible_greek, name = 'bible_greek'),
     path('bible_hebrew', views.bible_hebrew, name = 'bible_hebrew'),
     path('user_profile', views.user_profile, name = 'user_profile'),
+    path('meditation', views.add_meditaion, name = 'meditation'),
+    path('show_meditation', views.show_meditation, name = 'show_meditation'),
+    path('meditation_like/<int:pk>',views.likes_view,name='meditation_like'),
+    path('p_meditation',views.p_meditation,name='p_meditation'),
+    path('u_meditation/<int:id>',views.u_meditation,name='u_meditation'),
+    path('r_meditation/<int:id>',views.r_meditation,name='r_meditation'),
+    path('del_replies/<int:id>',views.del_reply,name='del_replies')
     
 ]

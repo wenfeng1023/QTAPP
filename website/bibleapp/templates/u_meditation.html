@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+<title>NEOQT365 </title>
+{% endblock %}
+{% block content %}
+<style>
+    ul > li {
+        display: inline-block;
+        /* You can also add some margins here to make it look prettier */
+    }
+</style>
+<div class="modal-body p-5 pt-0">
+    <form action="#" method = "POST" enctype='multipart/form-data'>
+        {% csrf_token %}
+        <div id='form-control'>
+            <label> 나의 묵상글:</label>
+            {{update_form.text}}
+        </div>
+        <br>
+        <div id='form-control'>
+            <ul>
+                <li>
+                {{update_form.choice}}
+                </li>
+                <li>
+                    <button type="submit" class="btn btn-outline-primary btn-sm">수정하기</button>
+                </li>
+            </ul>
+        </div>
+    </form>
+
+
+
+</div>
+
+
+{%endblock%}

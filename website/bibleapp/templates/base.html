@@ -118,21 +118,25 @@
 
         
                             
-                                <img src="{{user.user_profile.profile_img.url}}" class="avatar">{{user.username}}
+                                <img src="{{user.user_profile.profile_img.url}}" class="avatar rounded-circle">{{user.username}}
                             
                        
                             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="#">오늘말씀</a>
+                                    <a class="nav-link active" aria-current="page" href="{%url 'login'%}">오늘말씀</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="#">나의목상</a>
+                                    <a class="nav-link active" aria-current="page" href="{%url 'p_meditation'%}">나의묵상</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" href="{%url 'show_meditation'%}">모두목상</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link active" aria-current="page" href="#">나의기도</a>
                                 </li>
+                                
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="#">설정</a>
+                                    <a class="nav-link active" aria-current="page" href="{%url 'setting'%}">설정</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link active" aria-current="page" href="#">캘린더 보기</a>

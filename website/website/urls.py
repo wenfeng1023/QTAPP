@@ -22,7 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("bibleapp.urls")),
     path('accounts/', include('allauth.urls')),
-    path('setting', TemplateView.as_view(template_name='setting.html'), name='home')
-
+    # path('home', TemplateView.as_view(template_name='bible.html'), name='home')
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

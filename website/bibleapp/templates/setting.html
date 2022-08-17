@@ -12,12 +12,12 @@
 <form class='row g-3' method='POST' enctype="multipart/form-data">
     {% csrf_token %}
     <h5 class="modal-title">성경선택하기</h5>
-    <select class="form-select" aria-label="Default select example" name='test' required>
+    <select class="form-select" aria-label="Default select example" name='qt' required>
         <option value='매일성경 읽기'>매일성경 읽기</option>
 
     </select>
     <h5 class="modal-title">언어선택하기</h5>
-    <select class="form-select" aria-label="Default select example" name='test' required>
+    <select class="form-select" aria-label="Default select example" name='bible' required>
         <option value='한국어'>한국어</option>
         <option value="중국어">중국어</option>
         <option value="영어">영어</option>
