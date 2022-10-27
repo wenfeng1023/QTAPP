@@ -10,9 +10,15 @@
         /* You can also add some margins here to make it look prettier */
     }
 </style>
+
 <div class="modal-body p-5 pt-0">
+    
     <form action="#" method = "POST" enctype='multipart/form-data'>
         {% csrf_token %}
+        <div id='form-control'>
+            <label> 성경마씀:</label>
+            {{update_form.scripture}}
+        </div>
         <div id='form-control'>
             <label> 나의 묵상글:</label>
             {{update_form.text}}
@@ -29,10 +35,5 @@
             </ul>
         </div>
     </form>
-
-
-
 </div>
-
-
 {%endblock%}

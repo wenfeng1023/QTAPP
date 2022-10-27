@@ -4,15 +4,20 @@
 <title>NEOQT365 </title>
 {% endblock %}
 {% block content %}
+
 <style>
-    ul > li {
+    ul>li {
         display: inline-block;
         /* You can also add some margins here to make it look prettier */
     }
 </style>
 <div class="modal-body p-5 pt-0">
-    <form action="#" method = "POST" enctype='multipart/form-data'>
+    <form action="#" method="POST" enctype='multipart/form-data'>
         {% csrf_token %}
+        <div id='form-control'>
+            <label> 성경말씀:</label>
+            {{m_form.scripture}}
+        </div>
         <div id='form-control'>
             <label> 나의 묵상글:</label>
             {{m_form.text}}
@@ -21,7 +26,7 @@
         <div id='form-control'>
             <ul>
                 <li>
-                {{m_form.choice}}
+                    {{m_form.choice}}
                 </li>
                 <li>
                     <button type="submit" class="btn btn-outline-primary btn-sm">나의묵상글 등록하기</button>
@@ -29,10 +34,6 @@
             </ul>
         </div>
     </form>
-
-
-
 </div>
-
 
 {%endblock%}

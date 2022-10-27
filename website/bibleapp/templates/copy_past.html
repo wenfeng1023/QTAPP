@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+<title>NEOQT365 </title>
+{% endblock %}
+{% block content %}
+<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+<style>
+    ul > li {
+        display: inline-block;
+        /* You can also add some margins here to make it look prettier */
+    }
+</style>
+<div class="modal-body p-5 pt-0">
+    
+        {% csrf_token %}
+        <div id='form-control'>
+            <label> 성경마씀:</label>
+            <textarea id="w3review" name="w3review" rows="4" cols="50">
+               {{data}}
+            </textarea>
+        </div>
+        <a id="create-kakaotalk-sharing-btn" href="javascript:shareMessage();">
+            <img src="https://developers.kakao.com/assets/img/about/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png"
+                alt="Kakao Talk sharing button" />
+        </a>
+</div>
+<script type="text/javascript">
+    // Initialize SDK with JavaScript key for your app. 
+    Kakao.init('1ef32a55c0e50b9c8cc7e24d3fe77eb0');
+
+    // Check if the initialization is successfully done.
+    console.log(Kakao.isInitialized());
+
+    function shareMessage() {
+        // var TempText = document.createElement("textarea");
+        //TempText.innerHTML = text
+        //var message = 
+        var text = document.getElementById('w3review').value;
+        Kakao.Share.sendDefault({
+            objectType: 'text',
+            text: text,
+            link: {
+                mobileWebUrl: 'http://127.0.0.1:8000/p_meditation',
+                webUrl: 'http://127.0.0.1:8000/p_meditation',
+            },
+        })
+    }
+</script>
+
+{%endblock%}

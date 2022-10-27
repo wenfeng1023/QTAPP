@@ -45,7 +45,9 @@ class MyMeditationForm(forms.ModelForm):
     # owner = forms.CharField(max_length=50, widget=forms.TextInput(attrs={
     #     'class': 'form-control', 'readonly': 'readonly','cols': 80
     # }))
-
+    scripture = forms.CharField(widget= forms.Textarea(attrs={
+        'class': 'form-control'
+    }))
     text=forms.CharField(widget= forms.Textarea(attrs={
         'class': 'form-control'
     }))
@@ -56,7 +58,7 @@ class MyMeditationForm(forms.ModelForm):
 
     class Meta:
         model = My_Meditation
-        fields = ['text','choice']
+        fields = ['text','scripture','choice']
 
 
 class DateSaveForm(forms.Form):

@@ -14,6 +14,8 @@ from django.contrib import messages
 import os
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+import win32clipboard
+from django.db.models.functions import TruncMonth, TruncYear
 # Create your views here.
 
 
@@ -416,7 +418,11 @@ def user_profile(request):
 
 
 def add_meditaion(request):
-    m_form = MyMeditationForm()
+    data = CustomSetting.objects.filter(user=request.user).first()
+    win32clipboard.OpenClipboard()
+    scripture_data = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
+    win32clipboard.CloseClipboard()
+    print(data)
     if request.method == 'POST':
         m_form = MyMeditationForm(request.POST)
         if m_form.is_valid():
@@ -426,10 +432,29 @@ def add_meditaion(request):
             post.owner = request.user
 
             post.save()
-            return redirect('setting')
+            return redirect('login')
     else:
-        m_form = MyMeditationForm()
-        return render(request, 'meditation.html', {'m_form': m_form})
+        if data.lang == '한국어':
+            today = dt.datetime.today().strftime("%Y-%m-%d")
+            daily_bible = Daily_Bible.objects.get(Date=today)
+            book_no = daily_bible.Book_No
+            daily_verse = daily_bible.Text
+            book_name = korean_title.objects.get(Book_ID=book_no).Book
+            scripture = book_name +" "+ daily_verse
+            #scripture = scripture_data
+            m_form = MyMeditationForm(initial={'scripture':scripture, 'choice':1})
+            return render(request, 'meditation.html', {'m_form': m_form})
+        else:
+            today = dt.datetime.today().strftime("%Y-%m-%d")
+            daily_bible = Daily_Bible.objects.get(Date=today)
+            book_no = daily_bible.Book_No
+            book_name = English_ESV.objects.filter(Book_No=book_no).first().Book
+            daily_verse = daily_bible.Text
+            #scripture = book_name +" "+ daily_verse
+            scripture = scripture_data
+            m_form = MyMeditationForm(initial={'scripture':scripture,'choice':1})
+            return render(request, 'meditation.html', {'m_form': m_form})
+        
 
 
 '''
@@ -439,59 +464,45 @@ def add_meditaion(request):
 
 def show_meditation(request):
 
-    # date = datetime(2022,8,5).strftime('%Y-%m-%d')
-    # querysets = Q(created_date__date__icontains=today) and Q(
-    #     choice='1')
-    # # yesterday = dt.datetime.strptime(request.POST.get('date'),'%Y-%m-%d').strftime('%Y-%m-%d')
-    # meditation = My_Meditation.objects.filter(choice='1',created_date__date=date).all()
-    # return render (request, 'show_meditation.html',{'meditation':meditation})
     comments = Comments.objects.all()
     # form = DateSaveForm()
     obj = DateSave()
-
+    year_date = list(My_Meditation.objects.filter(created_date__year= str(dt.datetime.today().year)).values_list('created_date',flat=True))
+    mark_date = []
+    for md in year_date:
+        mark_date.append(md.strftime("%Y-%m-%d").replace('-0', '-'))
     if request.method == 'POST':
         data = DateSave.objects.all()
         if data.exists():
             data.delete()
+            #input_date = datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
             obj.date = request.POST.get('date')
             obj.save()
             date = request.POST.get('date')
             meditation = My_Meditation.objects.filter(
                 choice='1', created_date__date=request.POST.get('date'))
-            return render(request, 'show_meditation.html', {'meditation': meditation, 'date': date, 'comments': comments})
+           
+            return render(request, 'show_meditation.html', {'meditation': meditation, 'date': date, 'comments': comments,'mark_date':mark_date})
     else:
         today = dt.datetime.today().strftime('%Y-%m-%d')
         data = DateSave.objects.all().first()
         if data != None:
             meditation = My_Meditation.objects.filter(
-                choice='1', created_date__date=data.date)
+                choice='1', created_date__date=today)
             date = data.date
-            # data.delete()
-            # obj.date= today
-            # obj.save()
+            data.delete()
+            obj.date= today
+            obj.save()
 
-            return render(request, 'show_meditation.html', {'meditation': meditation, 'date': date, 'comments': comments})
+            return render(request, 'show_meditation.html', {'meditation': meditation, 'date': today, 'comments': comments,'mark_date':mark_date})
         else:
             obj.date = dt.datetime.today().strftime('%Y-%m-%d')
             obj.save()
             date = dt.datetime.today().strftime('%Y-%m-%d')
             meditation = My_Meditation.objects.filter(
                 choice='1', created_date__date=today)
-            return render(request, 'show_meditation.html', {'meditation': meditation, 'date': date, 'comments': comments})
-        # if data.date != today:
-        #     today = data.date
-        #     meditation = My_Meditation.objects.filter(choice='1',created_date__date=data.date)
-        #     data.delete()
-
-        #     data.date = dt.datetime.today().strftime('%Y-%m-%d')
-        #     data.save()
-        #     return render (request, 'show_meditation.html',{'meditation':meditation,'today':today,'comments':comments})
-        # elif data.date == today:
-        #     data.delete()
-        #     meditation = My_Meditation.objects.filter(choice='1',created_date__date=today)
-        #     obj.date =today
-        #     obj.save()
-        #     return render (request, 'show_meditation.html',{'meditation':meditation,'today':today,'comments':comments})
+            return render(request, 'show_meditation.html', {'meditation': meditation, 'date': date, 'comments': comments,'mark_date':mark_date})
+       
 
 
 '''
@@ -500,8 +511,20 @@ def show_meditation(request):
 
 
 def p_meditation(request):
-    obj = My_Meditation.objects.filter(owner=request.user.id)
-    return render(request, 'p_meditation.html', {'obj': obj})
+    today = dt.datetime.today().strftime('%Y-%m-%d')
+    year_date = list(My_Meditation.objects.filter(owner=request.user.id,created_date__year= str(dt.datetime.today().year)).values_list('created_date',flat=True))
+    mark_date = []
+    for md in year_date:
+        mark_date.append(md.strftime("%Y-%m-%d").replace('-0', '-'))
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        obj = My_Meditation.objects.filter(
+                owner=request.user.id, created_date__date=request.POST.get('date'))
+        return render(request, 'p_meditation.html', {'obj': obj,'date':date,'mark_date':mark_date})
+    else:
+        obj = My_Meditation.objects.filter(
+                owner=request.user.id, created_date__date=today)
+        return render(request, 'p_meditation.html', {'obj': obj,'date':today,'mark_date':mark_date})
 
 
 '''
@@ -538,7 +561,7 @@ def likes_view(request, pk):
         meditation.likes.remove(request.user)
     else:
         meditation.likes.add(request.user)
-    return HttpResponseRedirect(reverse('show_meditation'))
+    return HttpResponseRedirect(reverse('iframe_test'))
 
 
 '''
@@ -569,3 +592,34 @@ def del_reply(request, id):
     post_id = comments.post.id
 
     return redirect('r_meditation', id=post_id)
+
+
+def copy_past(request):
+    win32clipboard.OpenClipboard()
+    data = win32clipboard.GetClipboardData()
+    win32clipboard.CloseClipboard()
+    print(data)
+
+    return render (request, 'copy_past.html',{'data':data})
+
+def iframe_test(request):
+    comments = Comments.objects.all()
+    obj = DateSave()
+
+    today = dt.datetime.today().strftime('%Y-%m-%d')
+    data = DateSave.objects.all().first()
+    if data != None:
+        meditation = My_Meditation.objects.filter(
+            choice='1', created_date__date=data.date)
+        date = data.date
+        return render(request, 'icontent.html', {'meditation': meditation, 'date': date, 'comments': comments})
+    else:
+        obj.date = dt.datetime.today().strftime('%Y-%m-%d')
+        obj.save()
+        date = dt.datetime.today().strftime('%Y-%m-%d')
+        meditation = My_Meditation.objects.filter(
+            choice='1', created_date__date=today)
+        return render(request, 'icontent.html', {'meditation': meditation, 'date': today, 'comments': comments})
+
+def my_calendar(request):
+    return render(request, 'calendar.html',{})      

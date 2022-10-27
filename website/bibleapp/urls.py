@@ -15,6 +15,8 @@ urlpatterns = [
     path('p_meditation',views.p_meditation,name='p_meditation'),
     path('u_meditation/<int:id>',views.u_meditation,name='u_meditation'),
     path('r_meditation/<int:id>',views.r_meditation,name='r_meditation'),
-    path('del_replies/<int:id>',views.del_reply,name='del_replies')
-    
+    path('del_replies/<int:id>',views.del_reply,name='del_replies'),
+    path('copy_past',views.copy_past,name='copy_past'),
+    path('iframe_test',views.iframe_test,name='iframe_test'),
+    path('calendar',views.my_calendar,name='calendar')
 ]

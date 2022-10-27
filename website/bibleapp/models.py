@@ -209,14 +209,13 @@ class User_Profile(models.Model):
 '''
 class My_Meditation(models.Model):
     owner = models.ForeignKey(User,null= True,on_delete=models.CASCADE)
+    scripture = models.TextField(blank=True, null=True) 
     choice = models.CharField(max_length=10,default='1')
     created_date = models.DateTimeField(auto_now_add=True)
     text = models.TextField()
     likes = models.ManyToManyField(User, related_name='meditation_like')
 
 
-    def __str__(self):
-        return str(self.owner)
 
     def number_of_likes(self):
         return self.likes.count()
@@ -233,8 +232,6 @@ class Comments(models.Model):
     content = models.TextField(blank=True,null=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return self.owner
     
     class Meta:
         ordering= ('-created_date',)
@@ -255,9 +252,6 @@ class CustomSetting(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     lang = models.CharField(max_length=50)
     bible_plan = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.user
     
     class Meta:
         verbose_name = 'CustomSetting'

@@ -1,48 +1,176 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block title %}
 <title>NEOQT365 </title>
 {% endblock %}
 {% block content %}
 <style>
-    button.like {
+    button.kakao {
         background-color: white;
         padding: 0;
         border: none;
         outline: none;
 
     }
-</style>
 
+    .button1 {
+        background-color: white;
+    }
+
+    /* white */
+    .button2 {
+        background-color: white;
+    }
+
+    /* white */
+    .css-class-to-highlight {
+        background-color: red;
+    }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <link href="{% static 'css/show_meditation.css' %}" rel="stylesheet">
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css'>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
 
 <div class="modal-body p-5 pt-0">
-    
+    <div class = "d-flex justify-content-center">
+    <form action="#" method='POST'>
+        {% csrf_token %}
+
+        <button class='button button1' id="prev" style="border:none"><img src="{%static 'img/left-arrow.png'%}"
+                width="28" height="28"></button>
+        <input onchange="submit();" style="border:none;text-align:center;" type="text" class='form-group'
+            id="datePicker" name="date" value='{{date}}' data-dptxt="There are meditatons on highlight days">
+        <button class='button button2' id="next" style="border:none"><img src="{%static 'img/right-arrow.png'%}"
+                width="28" height="28"></button>
+        <!--<div id="datePicker" onchange="submit();"></div>-->
+
+    </form>
+    </br>
+</div>
     <div class="form-floating mb-3">
         {%for info in obj%}
-      
-        <div class="media g-mb-30 media-comment" style="cursor: pointer;" onclick="window.location='{%url 'u_meditation' info.id%}';">
+        <!-- onclick="window.location='{%url 'u_meditation' info.id%}';"-->
+        <div class="media g-mb-30 media-comment" style="cursor: pointer;">
             <div class="media-body u-shadow-v18 g-bg-secondary g-pa-30">
                 <div class="g-mb-15">
                     <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15"
                         src="{{info.owner.user_profile.profile_img.url}}" alt="Image Description">
                     <h5 class="h5 g-color-gray-dark-v1 mb-0">{{info.owner.username}}</h5>
-                    <span class="g-color-gray-dark-v4 g-font-size-12">{{info.created_date|date:"SHORT_DATE_FORMAT" }}</span>
+                    <span
+                        class="g-color-gray-dark-v4 g-font-size-12">{{info.created_date|date:"SHORT_DATE_FORMAT" }}</span>
                     {%if info.choice == '1'%}
                     <br>
-                    
+
                     <span class="g-color-gray-dark-v4 g-font-size-12">공개</span>
                     {%else%}
                     <br>
                     <span class="g-color-gray-dark-v4 g-font-size-12">비공개</span>
                     {% endif %}
+
                 </div>
+                <br>
+                <p>{{info.scripture|safe|linebreaks}}</p>
                 <p>{{info.text}}</p>
 
+                <ul class="list-inline d-sm-flex my-0">
+                    <li class="list-inline-item g-mr-20">
+                        <!--<input style="text-align:center;" type="text" value={{info.text}} id="yourtext">-->
+                        <!--<button id = 'btn' class ='btn btn-link'onclick="copyToClipboard('{{info.text}}')"><span>Copy</span></button>-->
+                        <!-- <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip"
+                            data-bs-toggle="tooltip" title="Copy to Clipboard"
+                            onclick="copyToClipboard('{{info.scripture}}\n\n{{info.text}}')">복제</button>-->
+                        <a href='{%url 'u_meditation' info.id%}'>
+                            <button class="btn btn-outline-secondary btn-sm">수정</button>
+                        </a>
+                    </li>
+                    <li class="list-inline-item g-mr-20">
+                        <input type='hidden' value='{{info.text}}' id='myInput'>
+                        <button id='kakaotalk-sharing-btn' class="kakao" onclick="shareMessage('{{info.scripture}}')">
+                            <img src="https://developers.kakao.com/assets/img/about/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png"
+                                alt="Kakao Talk sharing button" style="border:none;width:30px;height:30px;" />
+                            </a></button>
+                    </li>
+                </ul>
             </div>
         </div>
         {% endfor %}
+        <!-- <button type="button" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top">
+            Tooltip on top
+          </button> -->
     </div>
 </div>
+
+
+<script type="text/javascript">
+    // Initialize SDK with JavaScript key for your app. 
+    Kakao.init('1ef32a55c0e50b9c8cc7e24d3fe77eb0');
+
+    // Check if the initialization is successfully done.
+    console.log(Kakao.isInitialized());
+
+    function shareMessage(scripture) {
+        // var TempText = document.createElement("textarea");
+        //TempText.innerHTML = text
+        var inputVal = document.getElementById("myInput").value;
+        Kakao.Share.sendDefault({
+            objectType: 'text',
+            text: scripture + '\n' + inputVal,
+            link: {
+                mobileWebUrl: 'http://127.0.0.1:8000',
+                webUrl: 'http://127.0.0.1:8000',
+            },
+        });
+    }
+</script>
+<script type="text/javascript">
+    var disabledDays = {{mark_date | safe}};
+    console.log(typeof disabledDays);
+    console.log(disabledDays);
+    var date = new Date();
+
+    jQuery(document).ready(function () {
+        $("#datePicker").datepicker({
+            dateFormat: 'yy-mm-dd',
+            changeMonth:true,
+            changeYear:true,
+
+            beforeShowDay: function (date) {
+                var m = date.getMonth(),
+                    d = date.getDate(),
+                    y = date.getFullYear();
+                for (i = 0; i < disabledDays.length; i++) {
+                    if ($.inArray(y + '-' + (m + 1) + '-' + d, disabledDays) != -1) {
+                        //return [false];
+                        return [true, 'css-class-to-highlight', ''];
+                    }
+                }
+                return [true];
+            }
+        });
+        $("#datePicker").datepicker().on("click", function () {
+            var dTxt = $(this).data('dptxt');
+            $('.ui-datepicker-calendar').after('<span class="middle">' + dTxt + '</>');
+        });
+
+        $("#prev").click(function () {
+            var date = $('#datePicker').datepicker('getDate', '-1d');
+            date.setDate(date.getDate() - 1);
+            $('#datePicker').datepicker('setDate', date);
+        })
+
+        $("#next").click(function () {
+            var date = $('#datePicker').datepicker('getDate', '+1d');
+            date.setDate(date.getDate() + 1);
+            $('#datePicker').datepicker('setDate', date);
+        })
+    });
+</script>
 {%endblock%}
