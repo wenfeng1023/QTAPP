@@ -419,10 +419,10 @@ def user_profile(request):
 
 def add_meditaion(request):
     data = CustomSetting.objects.filter(user=request.user).first()
-    win32clipboard.OpenClipboard()
-    scripture_data = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
-    win32clipboard.CloseClipboard()
-    print(data)
+    # win32clipboard.OpenClipboard()
+    #scripture_data = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
+    # win32clipboard.CloseClipboard()
+    # print(data)
     if request.method == 'POST':
         m_form = MyMeditationForm(request.POST)
         if m_form.is_valid():
@@ -450,8 +450,8 @@ def add_meditaion(request):
             book_no = daily_bible.Book_No
             book_name = English_ESV.objects.filter(Book_No=book_no).first().Book
             daily_verse = daily_bible.Text
-            #scripture = book_name +" "+ daily_verse
-            scripture = scripture_data
+            scripture = book_name +" "+ daily_verse
+            #scripture = scripture_data
             m_form = MyMeditationForm(initial={'scripture':scripture,'choice':1})
             return render(request, 'meditation.html', {'m_form': m_form})
         
