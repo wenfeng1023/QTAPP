@@ -16,6 +16,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 import win32clipboard
 from django.db.models.functions import TruncMonth, TruncYear
+from django.http import JsonResponse
 # Create your views here.
 
 
@@ -622,4 +623,33 @@ def iframe_test(request):
         return render(request, 'icontent.html', {'meditation': meditation, 'date': today, 'comments': comments})
 
 def my_calendar(request):
-    return render(request, 'calendar.html',{})      
+    events = AddEvents.objects.filter(user=request.user.id)
+    return render(request, 'calendar.html',{'events':events})      
+
+def add_event(request):
+    start = request.GET.get("start", None)
+    end = request.GET.get("end", None)
+    title = request.GET.get("title", None)
+    event = AddEvents(user=request.user, name=str(title), start=start, end=end)
+    event.save()
+    return redirect('calendar')
+
+def update(request):
+    start = request.GET.get("start", None)
+    end = request.GET.get("end", None)
+    title = request.GET.get("title", None)
+    id = request.GET.get("id", None)
+    event = AddEvents.objects.get(id=id)
+    event.start = start
+    event.end = end
+    event.name = title
+    event.save()
+    data = {}
+    return redirect('calendar')
+
+def remove(request):
+    id = request.GET.get("id", None)
+    event = AddEvents.objects.get(id=id)
+    event.delete()
+    data = {}
+    return JsonResponse(data)

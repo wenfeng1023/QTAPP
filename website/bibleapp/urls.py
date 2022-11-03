@@ -18,5 +18,8 @@ urlpatterns = [
     path('del_replies/<int:id>',views.del_reply,name='del_replies'),
     path('copy_past',views.copy_past,name='copy_past'),
     path('iframe_test',views.iframe_test,name='iframe_test'),
-    path('calendar',views.my_calendar,name='calendar')
+    path('calendar',views.my_calendar,name='calendar'),
+    path('add_event',views.add_event,name='add_event'),
+    path('update', views.update, name='update'),
+    path('remove', views.remove, name='remove')
 ]

@@ -256,3 +256,16 @@ class CustomSetting(models.Model):
     class Meta:
         verbose_name = 'CustomSetting'
 
+'''
+    Adding event in Calendar
+'''
+class AddEvents(models.Model):
+    user = models.ForeignKey(User, null= True, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255,null=True,blank=True)
+    start = models.CharField(max_length=50,null=True,blank=True)
+    end = models.CharField(max_length=50,null=True,blank=True)
+
+    def __str__(self):
+        return self.name
+
+

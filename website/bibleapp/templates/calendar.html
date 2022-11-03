@@ -5,119 +5,172 @@
 <title>NEOQT365 </title>
 {% endblock %}
 {% block content %}
-<link href="{%static 'css/main.min.css'%}" rel='stylesheet' />
-<script src="{%static 'js/main.min.js'%}"></script>
 
+<link rel="stylesheet" href="{%static 'css/main.css'%}">
+<script src='{%static 'js/main.js'%}'></script>
+<script src='https://github.com/mozilla-comm/ical.js/releases/download/v1.4.0/ical.js'></script>
+
+<link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-        font-size: 14px;
-      }
+  body {
+    margin: 40px 10px;
+    padding: 0;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+    font-size: 14px;
     
-      #script-warning {
-        display: none;
-        background: #eee;
-        border-bottom: 1px solid #ddd;
-        padding: 0 10px;
-        line-height: 40px;
-        text-align: center;
-        font-weight: bold;
-        font-size: 12px;
-        color: red;
-      }
-    
-      #loading {
-        display: none;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-      }
-    
-      #calendar {
-        max-width: 1100px;
-        margin: 40px auto;
-        padding: 0 10px;
-      }
+  }
+
+  #calendar {
+    max-width: 3000px;
+    margin: 0 auto;
+  } 
 </style>
+<div class="modal-body p-5 pt-0">
+<div id='calendar' >
+  
+</div>
 
-<div  id='calendar'></div>
-
+</div>
+<!--
+<div class="modal-body p-5 pt-0">
+  <div class="header">
+    <div class="year-month"></div>
+    <div class="nav">
+      <button class="nav-btn go-prev" onclick="prevMonth()">&lt;</button>
+      <button class="nav-btn go-today" onclick="goToday()">Today</button>
+      <button class="nav-btn go-next" onclick="nextMonth()">&gt;</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="days">
+      <div class="day">일</div>
+      <div class="day">월</div>
+      <div class="day">화</div>
+      <div class="day">수</div>
+      <div class="day">목</div>
+      <div class="day">금</div>
+      <div class="day">토</div>
+    </div>
+    <div class="dates"></div>
+  </div>
+</div>
+-->
+<!--<script src="{%static 'js/index.js'%}"></script>-->
 <script>
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-    
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-        displayEventTime: false,
-          headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,dayGridWeek'
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      themeSystem: 'bootstrap5',
+      selectable:true,
+      //selectHelper: true,
+      //eventLimit: true,
+      select: function (arg) {
+        var title = prompt("Enter Event Title");
+        if(title){
+        $.ajax({
+          type: "GET",
+          url: '/add_event',
+          data:{'title':title,'start':arg.startStr,'end':arg.endStr},
+          success: function (data) {
+              //calendar.fullCalendar('refetchEvents');
+              alert("Added Successfully");
+              window.location.reload(true);
           },
-          initialDate: '2020-09-12',
-          dayMaxEvents: true, // allow "more" link when too many events
-          events: [
-            {
-              title: 'All Day Event',
-              start: '2020-09-01'
-            },
-            {
-              title: 'Long Event',
-              start: '2020-09-07',
-              end: '2020-09-10'
-            },
-            {
-              groupId: 999,
-              title: 'Repeating Event',
-              start: '2020-09-09T16:00:00'
-            },
-            {
-              groupId: 999,
-              title: 'Repeating Event',
-              start: '2020-09-16T16:00:00'
-            },
-            {
-              title: 'Conference',
-              start: '2020-09-11',
-              end: '2020-09-13'
-            },
-            {
-              title: 'Meeting',
-              start: '2020-09-12T10:30:00',
-              end: '2020-09-12T12:30:00'
-            },
-            {
-              title: 'Lunch',
-              start: '2020-09-12T12:00:00'
-            },
-            {
-              title: 'Meeting',
-              start: '2020-09-12T14:30:00'
-            },
-            {
-              title: 'Happy Hour',
-              start: '2020-09-12T17:30:00'
-            },
-            {
-              title: 'Dinner',
-              start: '2020-09-12T20:00:00'
-            },
-            {
-              title: 'Birthday Party',
-              start: '2020-09-13T07:00:00'
-            },
-            {
-              title: 'Click for Google',
-              url: 'http://google.com/',
-              start: '2020-09-28'
-            }
-          ]
-        });
-    
-        calendar.render();
+          error: function (data) {
+              alert('There is a problem!!!');
+          },
+          
+
       });
+    }
+      },
+      //initialDate: '2020-09-12',
+      editable: true,
+      selectable: true,
+      height: 'auto',
+      expandRows: true,
+      businessHours: true,
+      selectMirror: true,
+      dayMaxEvents: false, // allow "more" link when too many events
+      events: [
+        {% for events in events%}
+        {
+          id:'{{events.id}}',
+          title:'{{events.name}}',
+          start:'{{events.start}}',
+          end:'{{events.end}}'
+        },
+        {%endfor%}
+      ],
+      eventResize: function(info) {
+        //alert(info.event.id + " end is now " + info.event.end.toISOString());
+        var start = info.event.startStr;
+        var end = info.event.endStr;
+        var title = info.event.title;
+        var id = info.event.id;
     
+        $.ajax({
+          type: "GET",
+          url: '/update',
+          data: {'title': title, 'start': start, 'end': end, 'id': id},
+          //dataType: "json",
+          success: function (data) {
+              //calendar.fullCalendar('refetchEvents');
+              alert('Event Update');
+              window.location.reload(true);
+          },
+          error: function (data) {
+              alert('There is a problem!!!');
+          }
+      });
+      },
+      eventDrop: function (info) {
+        var start = info.event.startStr;
+        var end = info.event.endStr;
+        var title = info.event.title;
+        var id = info.event.id;
+        $.ajax({
+            type: "GET",
+            url: '/update',
+            data: {'title': title, 'start': start, 'end': end, 'id': id},
+            //dataType: "json",
+            success: function (data) {
+                //calendar.fullCalendar('refetchEvents');
+                alert('Event Update');
+                window.location.reload(true);
+            },
+            error: function (data) {
+                alert('There is a problem!!!');
+            }
+        });
+    },
+
+    eventClick: function (info) {
+      if (confirm("Are you sure you want to remove it?")) {
+          var id = info.event.id;
+          $.ajax({
+              type: "GET",
+              url: '/remove',
+              data: {'id': id},
+              //dataType: "json",
+              success: function (data) {
+                  //calendar.fullCalendar('refetchEvents');
+                  alert('Event Removed');
+                  window.location.reload(true);
+              },
+              error: function (data) {
+                  alert('There is a problem!!!');
+              }
+          });
+      }
+  },
+
+    });
+
+    calendar.render();
+  });
+
 </script>
 {%endblock%}
