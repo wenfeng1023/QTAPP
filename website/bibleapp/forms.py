@@ -4,7 +4,7 @@ from secrets import choice
 from django import forms
 from .models import User_Profile,DateSave
 from django.contrib.auth.models import User
-from .models import User_Profile,My_Meditation
+from .models import User_Profile,My_Meditation,Prayer
 from django.utils.safestring import mark_safe
 
 class UpdateUserProfileForm(forms.ModelForm):
@@ -59,6 +59,24 @@ class MyMeditationForm(forms.ModelForm):
     class Meta:
         model = My_Meditation
         fields = ['text','scripture','choice']
+
+class PrayerForm(forms.ModelForm):
+    # owner = forms.CharField(max_length=50, widget=forms.TextInput(attrs={
+    #     'class': 'form-control', 'readonly': 'readonly','cols': 80
+    # }))
+    title = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
+        'class': 'form-control'}))
+    text=forms.CharField(widget= forms.Textarea(attrs={
+        'class': 'form-control'
+    }))
+    choice= [('1','공개'),('2','비공개')]
+    choice = forms.CharField(widget=forms.RadioSelect(choices=choice)
+       )
+    
+
+    class Meta:
+        model = Prayer
+        fields = ['title','text','choice']
 
 
 class DateSaveForm(forms.Form):

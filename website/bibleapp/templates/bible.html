@@ -36,12 +36,11 @@
         {% endfor %}
     </div>
     <a href="{%url 'meditation'%}">
-        <!-- <button id="copy-button" type="button" class="btn btn-outline-primary btn-sm"
-            onclick="CopyToClipboard('editor1')">나의묵상글 등록하기</button></a>-->
         <button id="copy-button" type="button" class="btn btn-outline-primary btn-sm">나의묵상글 등록하기</button>
-        <a href="{%url 'p_meditation'%}">
-            <button type="button" class="btn btn-outline-primary btn-sm">나의묵상글 보기</button>
-        </a>
+    </a>
+    <a href="{%url 'prayer'%}">
+        <button type="button" class="btn btn-outline-primary btn-sm">나의기도등록하기</button>
+    </a>
 </div>
 <script>
     function testClipboard() {

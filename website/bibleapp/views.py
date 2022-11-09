@@ -3,7 +3,7 @@ from msilib.schema import InstallExecuteSequence
 from secrets import choice
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect, render
-from .forms import DateSaveForm, MyMeditationForm, UpdateUserProfileForm, UserUpdateForm
+from .forms import DateSaveForm, MyMeditationForm, UpdateUserProfileForm, UserUpdateForm,PrayerForm
 from .models import *
 from django.db.models import Q
 from django.db.models import IntegerField
@@ -455,9 +455,61 @@ def add_meditaion(request):
             #scripture = scripture_data
             m_form = MyMeditationForm(initial={'scripture':scripture,'choice':1})
             return render(request, 'meditation.html', {'m_form': m_form})
-        
+'''
+    add prayer request
+'''       
+def prayer(request):
+    if request.method == 'POST':
+        P_form = PrayerForm(request.POST)
+        if P_form.is_valid():
+            # create an unsave database object
+            post = P_form.save(commit=False)
+            # get users
+            post.owner = request.user
+
+            post.save()
+            return redirect('login')
+    else:
+        P_form = PrayerForm(initial={'choice':1})
+        return render(request, 'prayer.html',{"P_form":P_form})
+'''
+    show my prayer request
+'''
+def my_prayer(request):
+    today = dt.datetime.today().strftime('%Y-%m-%d')
+    year_date = list(Prayer.objects.filter(owner=request.user.id,created_date__year= str(dt.datetime.today().year)).values_list('created_date',flat=True))
+    mark_date = []
+    for md in year_date:
+        mark_date.append(md.strftime("%Y-%m-%d").replace('-0', '-'))
+
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        obj = Prayer.objects.filter(
+                owner=request.user.id, created_date__date=request.POST.get('date'))
+        return render(request, 'p_prayer.html', {'obj': obj,'date':date,'mark_date':mark_date})
+    else:
+        obj = Prayer.objects.filter(
+                owner=request.user.id, created_date__date=today)
+        return render(request, 'p_prayer.html', {'obj': obj,'date':today,'mark_date':mark_date})
 
 
+'''
+    update my prayer
+'''
+def u_prayer(request,id):
+    obj = Prayer.objects.get(id=id)
+    if request.method == 'POST':
+        update_form = PrayerForm(request.POST, instance=obj)
+        if update_form.is_valid():
+            # create an unsave database object
+            post = update_form.save(commit=False)
+            # get users
+            post.owner = request.user
+            post.save()
+            return redirect('my_prayer')
+    else:
+        update_form = PrayerForm(instance=obj)
+        return render(request, 'u_prayer.html', {'update_form': update_form})
 '''
     show the user's meditation
 '''

@@ -224,6 +224,25 @@ class My_Meditation(models.Model):
         ordering = ('-created_date',)
         verbose_name = 'Meditation'
 '''
+    Add prayer request     
+    This model save uers' prayer requests.
+
+'''
+class Prayer(models.Model):
+    owner = models.ForeignKey(User,null= True,on_delete=models.CASCADE)
+    choice = models.CharField(max_length=10,default='1')
+    created_date = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=100, null=True,blank=True)
+    text = models.TextField()
+
+    def __str__(self):
+        return self.title
+
+
+
+
+
+'''
     this model save user's replies
 '''
 class Comments(models.Model):
