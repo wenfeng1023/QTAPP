@@ -427,6 +427,7 @@ def add_meditaion(request):
     if request.method == 'POST':
         m_form = MyMeditationForm(request.POST)
         if m_form.is_valid():
+            
             # create an unsave database object
             post = m_form.save(commit=False)
             # get users
@@ -515,8 +516,8 @@ def u_prayer(request,id):
 '''
 
 
-def show_meditation(request):
-
+def show_meditation(request,*args, **kwargs):
+    #print(slug)
     comments = Comments.objects.all()
     # form = DateSaveForm()
     obj = DateSave()
@@ -529,7 +530,7 @@ def show_meditation(request):
         if data.exists():
             data.delete()
             #input_date = datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
-            obj.date = request.POST.get('date')
+            obj.date = request.POST.get('date') 
             obj.save()
             date = request.POST.get('date')
             meditation = My_Meditation.objects.filter(
@@ -539,14 +540,19 @@ def show_meditation(request):
     else:
         today = dt.datetime.today().strftime('%Y-%m-%d')
         data = DateSave.objects.all().first()
-        if data != None:
+        re_date = request.GET.get('item')
+        # Go back to specify page when someone relied messages
+        if re_date != None:
+            meditation = My_Meditation.objects.filter(choice='1',created_date=re_date)
+            return render(request, 'show_meditation.html', {'meditation': meditation, 'date': re_date, 'comments': comments,'mark_date':mark_date})
+
+        elif re_date==None and data != None:
             meditation = My_Meditation.objects.filter(
                 choice='1', created_date__date=today)
             date = data.date
             data.delete()
             obj.date= today
             obj.save()
-
             return render(request, 'show_meditation.html', {'meditation': meditation, 'date': today, 'comments': comments,'mark_date':mark_date})
         else:
             obj.date = dt.datetime.today().strftime('%Y-%m-%d')
@@ -622,17 +628,26 @@ def likes_view(request, pk):
 '''
 
 
-def r_meditation(request, id):
+def r_meditation(request,id):
     obj = My_Meditation.objects.get(id=id)
     comments = Comments.objects.filter(post=obj)
+    date = obj.created_date.strftime('%Y-%m-%d')
     if request.method == 'POST':
         comments = Comments(owner=request.user, post=obj,
                             content=request.POST.get('textAreaExample'))
         comments.save()
+        #return redirect(reverse('show_meditation')+ '?item='+date+'')
         return redirect('r_meditation', id=id)
     else:
         return render(request, 'r_meditation.html', {'obj': obj, 'comments': comments})
 
+'''
+    Go back specify page when someone click the button
+'''
+def go_back(request,id):
+    obj = My_Meditation.objects.get(id=id)
+    date = obj.created_date.strftime('%Y-%m-%d')
+    return redirect(reverse('show_meditation')+ '?item='+date+'')
 
 '''
     delete replies
@@ -661,6 +676,7 @@ def iframe_test(request):
 
     today = dt.datetime.today().strftime('%Y-%m-%d')
     data = DateSave.objects.all().first()
+
     if data != None:
         meditation = My_Meditation.objects.filter(
             choice='1', created_date__date=data.date)

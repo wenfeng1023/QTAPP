@@ -9,7 +9,6 @@
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 
 <div class="modal-body p-5 pt-0">
-
     <div class="form-floating mb-3">
         <!--
         <div class="media g-mb-30 media-comment" style="cursor: pointer;">
@@ -83,6 +82,7 @@
     <!--submit comments-->
     <form method="POST" enctype='multipart/form-data'>
         {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
         <div class="card-footer py-3 border-0" style="background-color: #f8f9fa;">
             <div class="d-flex flex-start w-100">
                 <img class="rounded-circle shadow-1-strong me-3" src="{{user.user_profile.profile_img.url}}" alt="avatar"
@@ -94,7 +94,10 @@
             </div>
             <div class="float-end mt-2 pt-1">
                 <button type="submit" class="btn btn-primary btn-sm">게시</button>
-                <button type="button" class="btn btn-outline-primary btn-sm" onclick="window.history.go(-1); return false;">최소</button>
+                <a href="{%url 'go_back' obj.id%}">
+                <button type="button" class="btn btn-outline-primary btn-sm">되돌다</button>
+                </a>
+ 
             </div>
         </div>
     </form>
