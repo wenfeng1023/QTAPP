@@ -14,6 +14,7 @@ urlpatterns = [
     path('prayer',views.prayer, name= 'prayer'),
     path('my_prayer',views.my_prayer, name= 'my_prayer'),
     path('u_prayer/<int:id>',views.u_prayer, name= 'u_prayer'),
+    path('show_prayer',views.show_prayer, name= 'show_prayer'),
     path('meditation_like/<int:pk>',views.likes_view,name='meditation_like'),
     path('p_meditation',views.p_meditation,name='p_meditation'),
     path('u_meditation/<int:id>',views.u_meditation,name='u_meditation'),

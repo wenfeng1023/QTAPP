@@ -493,6 +493,25 @@ def my_prayer(request):
                 owner=request.user.id, created_date__date=today)
         return render(request, 'p_prayer.html', {'obj': obj,'date':today,'mark_date':mark_date})
 
+'''
+    show all prayers
+'''
+def show_prayer(request):
+    today = dt.datetime.today().strftime('%Y-%m-%d')
+    year_date = list(Prayer.objects.filter(choice='1',created_date__year= str(dt.datetime.today().year)).values_list('created_date',flat=True))
+    mark_date = []
+    for md in year_date:
+        mark_date.append(md.strftime("%Y-%m-%d").replace('-0', '-'))
+
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        obj = Prayer.objects.filter(
+                choice='1', created_date__date=request.POST.get('date'))
+        return render(request, 'show_prayer.html', {'obj': obj,'date':date,'mark_date':mark_date})
+    else:
+        obj = Prayer.objects.filter(
+                choice='1', created_date__date=today)
+        return render(request, 'show_prayer.html', {'obj': obj,'date':today,'mark_date':mark_date})
 
 '''
     update my prayer
