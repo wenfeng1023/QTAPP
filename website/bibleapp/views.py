@@ -57,22 +57,24 @@ def setting(request):
 
 
 def Bible_ESV(request):
-    # verse = Hebrew.objects.filter(Book='Numbers')
-    # for v in verse:
-    #     verse = v.Text
-    #     return HttpResponse(verse)
-    # obj = Hebrew_Bible.objects.all()
-    # obj.delete()
-    # querysets = Q(book__icontains="43") & Q(
-    #     chapter__icontains="1")& Q(
-    #     content__range=('1','4'))
-    today = dt.datetime.today().strftime("%Y-%m-%d")
+
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        daily_bible = Daily_Bible.objects.get(Date=date)
+        book_no = daily_bible.Book_No
+        cont = (daily_bible.Text).count(":")
+        daily_verse = daily_bible.Text
+        book_name = korean_title.objects.get(Book_ID=book_no).Book
+    else:
+        date = dt.datetime.today().strftime("%Y-%m-%d")    
+        daily_bible = Daily_Bible.objects.get(Date=date)
+        book_no = daily_bible.Book_No
+        cont = (daily_bible.Text).count(":")
+        daily_verse = daily_bible.Text
+        book_name = korean_title.objects.get(Book_ID=book_no).Book
+
     # yesterday = (dt.datetime.today() - timedelta(days=2)).strftime("%Y-%m-%d")
-    daily_bible = Daily_Bible.objects.get(Date=today)
-    book_no = daily_bible.Book_No
-    cont = (daily_bible.Text).count(":")
-    book_name = English_ESV.objects.filter(Book_No=book_no).first().Book
-    daily_verse = daily_bible.Text
+
     if cont > 1:
         text = (daily_bible.Text).split("-")
         start_ch = int(text[0].split(":")[0])
@@ -115,7 +117,7 @@ def Bible_ESV(request):
             Verse_as_int__range=(start_v, end_v)
         )
 
-    return render(request, 'bible.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': today, 'book_name': book_name})
+    return render(request, 'bible.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': date, 'book_name': book_name})
 
 
 '''
@@ -125,12 +127,22 @@ Chinese Bible Version
 
 def bible_chinese(request):
 
-    today = dt.datetime.today().strftime("%Y-%m-%d")
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        daily_bible = Daily_Bible.objects.get(Date=date)
+        book_no = daily_bible.Book_No
+        cont = (daily_bible.Text).count(":")
+        daily_verse = daily_bible.Text
+        book_name = korean_title.objects.get(Book_ID=book_no).Book
+    else:
+        date = dt.datetime.today().strftime("%Y-%m-%d")    
+        daily_bible = Daily_Bible.objects.get(Date=date)
+        book_no = daily_bible.Book_No
+        cont = (daily_bible.Text).count(":")
+        daily_verse = daily_bible.Text
+        book_name = korean_title.objects.get(Book_ID=book_no).Book
+
     # yesterday = (dt.datetime.today() - timedelta(days=2)).strftime("%Y-%m-%d")
-    daily_bible = Daily_Bible.objects.get(Date=today)
-    book_no = daily_bible.Book_No
-    cont = (daily_bible.Text).count(":")
-    daily_verse = daily_bible.Text
     book_name = Chinese_Bible.objects.filter(Book_No=book_no).first().Book
     if cont > 1:
         text = (daily_bible.Text).split("-")
@@ -174,7 +186,7 @@ def bible_chinese(request):
             Verse_as_int__range=(start_v, end_v)
         )
 
-    return render(request, 'bible.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': today, 'book_name': book_name})
+    return render(request, 'bible.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': date, 'book_name': book_name})
 
 
 '''
@@ -184,14 +196,22 @@ Koran Bible. 개역한글
 
 
 def bible_korean(request):
-
-    today = dt.datetime.today().strftime("%Y-%m-%d")
     # yesterday = (dt.datetime.today() - timedelta(days=2)).strftime("%Y-%m-%d")
-    daily_bible = Daily_Bible.objects.get(Date=today)
-    book_no = daily_bible.Book_No
-    cont = (daily_bible.Text).count(":")
-    daily_verse = daily_bible.Text
-    book_name = korean_title.objects.get(Book_ID=book_no).Book
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        daily_bible = Daily_Bible.objects.get(Date=date)
+        book_no = daily_bible.Book_No
+        cont = (daily_bible.Text).count(":")
+        daily_verse = daily_bible.Text
+        book_name = korean_title.objects.get(Book_ID=book_no).Book
+    else:
+        date = dt.datetime.today().strftime("%Y-%m-%d")    
+        daily_bible = Daily_Bible.objects.get(Date=date)
+        book_no = daily_bible.Book_No
+        cont = (daily_bible.Text).count(":")
+        daily_verse = daily_bible.Text
+        book_name = korean_title.objects.get(Book_ID=book_no).Book
+
     if cont > 1:
         text = (daily_bible.Text).split("-")
         start_ch = int(text[0].split(":")[0])
@@ -234,7 +254,7 @@ def bible_korean(request):
             Verse_as_int__range=(start_v, end_v)
         )
 
-    return render(request, 'bible.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': today, 'book_name': book_name})
+    return render(request, 'bible.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': date, 'book_name': book_name})
 
 
 '''
@@ -244,12 +264,21 @@ GreeK Bible(NT).
 
 def bible_greek(request):
 
-    today = dt.datetime.today().strftime("%Y-%m-%d")
-    # yesterday = (dt.datetime.today() - timedelta(days=2)).strftime("%Y-%m-%d")
-    daily_bible = Daily_Bible.objects.get(Date=today)
-    book_no = daily_bible.Book_No
-    cont = (daily_bible.Text).count(":")
-    daily_verse = daily_bible.Text
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        daily_bible = Daily_Bible.objects.get(Date=date)
+        book_no = daily_bible.Book_No
+        cont = (daily_bible.Text).count(":")
+        daily_verse = daily_bible.Text
+        book_name = korean_title.objects.get(Book_ID=book_no).Book
+    else:
+        date = dt.datetime.today().strftime("%Y-%m-%d")    
+        daily_bible = Daily_Bible.objects.get(Date=date)
+        book_no = daily_bible.Book_No
+        cont = (daily_bible.Text).count(":")
+        daily_verse = daily_bible.Text
+        book_name = korean_title.objects.get(Book_ID=book_no).Book
+
 
     if int(book_no) >= 40:
         book_name = Greek_Bible.objects.filter(Book_No=book_no).first().Book
@@ -283,7 +312,7 @@ def bible_greek(request):
                 Chapter_as_int__range=(start_ch, end_ch),
                 id__range=(strat_id, end_id),
             )
-            return render(request, 'bible_original.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': today, 'book_name': book_name})
+            return render(request, 'bible_original.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': date, 'book_name': book_name})
         else:
             text = (daily_bible.Text).split(":")
             chapter = int(text[0])
@@ -296,12 +325,12 @@ def bible_greek(request):
                 Chapter=chapter,
                 Verse_as_int__range=(start_v, end_v)
             )
-            return render(request, 'bible_original.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': today, 'book_name': book_name})
+            return render(request, 'bible_original.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': date, 'book_name': book_name})
 
     else:
         messages.info(request, "오늘 신약 말씀이 아니다.")
 
-        return render(request, 'bible_original.html', {})
+        return render(request, 'bible_original.html', {'today': date, })
 
 
 '''
@@ -313,14 +342,24 @@ Modern Israeli Hebrew compilation from Westmister (OT) and Modern Hebrew(NT).
 
 def bible_hebrew(request):
 
-    today = dt.datetime.today().strftime("%Y-%m-%d")
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        daily_bible = Daily_Bible.objects.get(Date=date)
+        book_no = daily_bible.Book_No
+        cont = (daily_bible.Text).count(":")
+        daily_verse = daily_bible.Text
+        book_name = korean_title.objects.get(Book_ID=book_no).Book
+    else:
+        date = dt.datetime.today().strftime("%Y-%m-%d")    
+        daily_bible = Daily_Bible.objects.get(Date=date)
+        book_no = daily_bible.Book_No
+        cont = (daily_bible.Text).count(":")
+        daily_verse = daily_bible.Text
+        book_name = korean_title.objects.get(Book_ID=book_no).Book
+
     # yesterday = (dt.datetime.today() - timedelta(days=2)).strftime("%Y-%m-%d")
-    daily_bible = Daily_Bible.objects.get(Date=today)
-    book_no = daily_bible.Book_No
-    cont = (daily_bible.Text).count(":")
-    daily_verse = daily_bible.Text
-    book_name = Hebrew_Bible.objects.filter(Book_No=book_no).first().Book
     if int(book_no) < 40:
+        book_name = Hebrew_Bible.objects.filter(Book_No=book_no).first().Book
         if cont > 1:
             text = (daily_bible.Text).split("-")
             start_ch = int(text[0].split(":")[0])
@@ -350,7 +389,7 @@ def bible_hebrew(request):
                 Chapter_as_int__range=(start_ch, end_ch),
                 id__range=(strat_id, end_id),
             )
-            return render(request, 'bible_original.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': today, 'book_name': book_name})
+            return render(request, 'bible_original.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': date, 'book_name': book_name})
         else:
             text = (daily_bible.Text).split(":")
             chapter = int(text[0])
@@ -363,10 +402,10 @@ def bible_hebrew(request):
                 Chapter=chapter,
                 Verse_as_int__range=(start_v, end_v)
             )
-            return render(request, 'bible_original.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': today, 'book_name': book_name})
+            return render(request, 'bible_original.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': date, 'book_name': book_name})
     else:
         messages.info(request, '오늘 구약 말씀이 아니다.')
-        return render(request, 'bible_original.html', {})
+        return render(request, 'bible_original.html', {'today': date,})
 
 
 def login(request):
