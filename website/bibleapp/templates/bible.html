@@ -21,6 +21,29 @@
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+
+<style>
+    .main-content {
+        direction: rtl;
+        /* Right to Left */
+    }
+
+    @font-face {
+        font-family: 'Ezra SIL SR';
+        src: url({%static 'fonts/ezrasilsr-webfont.eot'%}?#iefix) format('embedded-opentype'),
+            url({%static 'fonts/ezrasilsr-webfont.woff'%}) format('woff'),
+            url({%static 'fonts/ezrasilsr-webfont.ttf'%}') format('truetype'),
+            url({%static 'fonts/ezrasilsr-webfont.svg#EzraSILSR'%}) format('svg');
+    }
+
+    .ezra {
+        font-family: 'Ezra SIL SR';
+        direction: rtl;
+        text-align: right;
+    }
+
+    @import url(http://fonts.googleapis.com/earlyaccess/alefhebrew.css);
+</style>
 <div class="modal-header p-5 pb-4 border-bottom-0">
     <!-- <h5 class="modal-title">Modal title</h5> -->
     <h2 class="fw-bold mb-0">오늘말씀</h2>
@@ -48,13 +71,40 @@
 <div class="modal-body p-5 pt-0">
     <!--<button id="button1" onclick="CopyToClipboard('editor1')">COPY</button> -->
     <div id='editor1' class="form-floating mb-3">
-        <h5 class="fw-bold mb-0">{{today}} {{book_name}} {{daily_verse}}</h5>
+        <h5 class="fw-bold mb-0">{{today}} {{book_name}} {{daily_verse}}
+            {%if bible_qt == '생명의삶'%}
+            <a href = "http://www.cgntv.net/legacy/player.cgn?skin=duranno&vday={{f_date}}&pid=24" target="_blank">
+                <img src = "{% static 'img/icons8-link-16.png'%}">
+            </a>
+            {%else%}
+            <a href = "https://sum.su.or.kr:8888/bible/today" target="_blank">
+                <img src = "{% static 'img/icons8-link-16.png'%}">
+            </a>
+            {%endif%}
+        </h5>
         <br>
-        {%for text in scripture%}
-        <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
-
-        {% endfor %}
+        {%if language_1 != language_2 and language_2 != '히브리어(국약)'%}
+            {%for text,text2 in fina_scripture%}     
+                    <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>  
+                    <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>  
+                    <br>
+            {% endfor %}
+        {%elif language_1 != language_2 and language_2 == '히브리어(국약)'%}
+            {%for text,text2 in fina_scripture%}     
+                <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>  
+                <p class='ezra'><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
+                <br>
+            {% endfor %}
+        {%else%}
+            {%for text in fina_scripture%}
+            <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
+            {%endfor%}
+        {%endif%}
+        {% for message in messages %}
+        <p class='successMsg'>{{message}}</p>
+        {% endfor%}
     </div>
+
     <a href="{%url 'meditation'%}">
         <button id="copy-button" type="button" class="btn btn-outline-primary btn-sm">나의묵상글 등록하기</button>
     </a>
@@ -101,8 +151,8 @@
             dateFormat: 'yy-mm-dd',
             changeMonth:true,
             changeYear:true,
-            minDate: new Date('2022'),
-            maxDate: "+1M",     
+            minDate: new Date("2023"),
+            maxDate: "+3w"    
         });
         $("#datePicker").datepicker().on("click", function () {
             var dTxt = $(this).data('dptxt');

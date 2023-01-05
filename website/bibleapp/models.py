@@ -183,6 +183,16 @@ class Daily_Bible(models.Model):
 
     def __str__(self):
         return self.Date
+
+
+class living_life(models.Model):
+    Book_No = models.CharField(max_length=100)
+    Text = models.CharField(max_length=100)
+    Date = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.Date
+        
 class korean_title(models.Model):
     Book_ID = models.IntegerField()
     Book = models.CharField(max_length=50)
@@ -269,7 +279,8 @@ class DateSave(models.Model):
 '''
 class CustomSetting(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
-    lang = models.CharField(max_length=50)
+    lang_1 = models.CharField(max_length=50)
+    lang_2 = models.CharField(max_length=50,null=True,blank=True)
     bible_plan = models.CharField(max_length=50)
     
     class Meta:
