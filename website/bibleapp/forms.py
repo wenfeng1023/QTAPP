@@ -54,11 +54,12 @@ class MyMeditationForm(forms.ModelForm):
     choice= [('1','공개'),('2','비공개')]
     choice = forms.CharField(widget=forms.RadioSelect(choices=choice)
        )
+    created_date =forms.DateTimeField(input_formats=['%Y-%m-%d'],widget=forms.DateTimeInput(attrs={'type':'date','readonly':'readonly'}))
     
 
     class Meta:
         model = My_Meditation
-        fields = ['text','scripture','choice']
+        fields = ['text','scripture','choice','created_date']
 
 class PrayerForm(forms.ModelForm):
     # owner = forms.CharField(max_length=50, widget=forms.TextInput(attrs={

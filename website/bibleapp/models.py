@@ -221,7 +221,7 @@ class My_Meditation(models.Model):
     owner = models.ForeignKey(User,null= True,on_delete=models.CASCADE)
     scripture = models.TextField(blank=True, null=True) 
     choice = models.CharField(max_length=10,default='1')
-    created_date = models.DateTimeField(auto_now_add=True)
+    created_date = models.DateTimeField()
     text = models.TextField()
     likes = models.ManyToManyField(User, related_name='meditation_like')
 
@@ -229,6 +229,9 @@ class My_Meditation(models.Model):
 
     def number_of_likes(self):
         return self.likes.count()
+
+    # def __str__(self):
+    #     return self.created_date
     
     class Meta:
         ordering = ('-created_date',)

@@ -526,6 +526,7 @@ def user_profile(request):
 
 def add_meditaion(request):
     data = CustomSetting.objects.filter(user=request.user).first()
+    date = request.GET.get('new_date')
     # win32clipboard.OpenClipboard()
     # scripture_data = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
     # win32clipboard.CloseClipboard()
@@ -542,20 +543,20 @@ def add_meditaion(request):
             post.save()
             return redirect('login')
     else:
-        if data.lang == '한국어':
+        if data.lang_1 == '한국어':
             today = dt.datetime.today().strftime("%Y-%m-%d")
-            daily_bible = Daily_Bible.objects.get(Date=today)
+            daily_bible = bible_plan(request,date)
             book_no = daily_bible.Book_No
             daily_verse = daily_bible.Text
             book_name = korean_title.objects.get(Book_ID=book_no).Book
             scripture = book_name + " " + daily_verse
             # scripture = scripture_data
             m_form = MyMeditationForm(
-                initial={'scripture': scripture, 'choice': 1})
+                initial={'scripture': scripture, 'choice': 1,'created_date':date})
             return render(request, 'meditation.html', {'m_form': m_form})
         else:
             today = dt.datetime.today().strftime("%Y-%m-%d")
-            daily_bible = Daily_Bible.objects.get(Date=today)
+            daily_bible = bible_plan(request,date)
             book_no = daily_bible.Book_No
             book_name = English_ESV.objects.filter(
                 Book_No=book_no).first().Book
@@ -563,7 +564,7 @@ def add_meditaion(request):
             scripture = book_name + " " + daily_verse
             # scripture = scripture_data
             m_form = MyMeditationForm(
-                initial={'scripture': scripture, 'choice': 1})
+                initial={'scripture': scripture, 'choice': 1,'created_date':date})
             return render(request, 'meditation.html', {'m_form': m_form})
 
 
@@ -668,7 +669,7 @@ def show_meditation(request, *args, **kwargs):
     # form = DateSaveForm()
     obj = DateSave()
     year_date = list(My_Meditation.objects.filter(created_date__year=str(
-        dt.datetime.today().year)).values_list('created_date', flat=True))
+        dt.date.today().year)).values_list('created_date', flat=True))
     mark_date = []
     for md in year_date:
         mark_date.append(md.strftime("%Y-%m-%d").replace('-0', '-'))

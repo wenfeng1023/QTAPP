@@ -104,14 +104,16 @@
         <p class='successMsg'>{{message}}</p>
         {% endfor%}
     </div>
-
-    <a href="{%url 'meditation'%}">
-        <button id="copy-button" type="button" class="btn btn-outline-primary btn-sm">나의묵상글 등록하기</button>
-    </a>
+     <button id="copy-button" type="submit" class="btn btn-outline-primary btn-sm" onclick="event.preventDefault();document.getElementById('magic-form').submit();">나의묵상글 등록하기</button> 
     <a href="{%url 'prayer'%}">
         <button type="button" class="btn btn-outline-primary btn-sm">나의기도등록하기</button>
     </a>
 </div>
+<form id="magic-form" action="{%url 'meditation'%}" method="GET" style="display: none;">
+    {% csrf_token %} <!-- from your framework -->
+  <input type="hidden" name="new_date" value="{{today}}" />
+  <!-- other fields -->
+</form>
 <script>
     function testClipboard() {
         navigator.clipboard.writeText("Clipboard API Test").then(
