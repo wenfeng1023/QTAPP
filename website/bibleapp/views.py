@@ -60,7 +60,7 @@ def Bible_ESV(request):
     language_2 = CustomSetting.objects.get(user=request.user).lang_2
     if request.method == 'POST':
         date = request.POST.get('date')
-        f_date = date.replace('-', '')
+        f_date = date.replace('-', '')[2:]
         daily_bible = bible_plan(request,date)
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
@@ -68,7 +68,7 @@ def Bible_ESV(request):
         book_name = korean_title.objects.get(Book_ID=book_no).Book
     else:
         date = dt.datetime.today().strftime("%Y-%m-%d")
-        f_date = date.replace('-', '')
+        f_date = date.replace('-', '')[2:]
         daily_bible = bible_plan(request,date)
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
@@ -145,7 +145,7 @@ def bible_chinese(request):
     language_2 = CustomSetting.objects.get(user=request.user).lang_2
     if request.method == 'POST':
         date = request.POST.get('date')
-        f_date = date.replace('-', '')
+        f_date = date.replace('-', '')[2:]
         daily_bible = bible_plan(request,date)
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
@@ -153,7 +153,7 @@ def bible_chinese(request):
         book_name = korean_title.objects.get(Book_ID=book_no).Book
     else:
         date = dt.datetime.today().strftime("%Y-%m-%d")
-        f_date = date.replace('-', '')
+        f_date = date.replace('-', '')[2:]
         daily_bible = bible_plan(request,date)
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
@@ -237,7 +237,7 @@ def bible_korean(request):
     language_2 = CustomSetting.objects.get(user=request.user).lang_2
     if request.method == 'POST':
         date = request.POST.get('date')
-        f_date = date.replace('-', '')
+        f_date = date.replace('-', '')[2:]
 
         # if bible_plan == '생명의삶':
         #     daily_bible = living_life.objects.get(Date=date)
@@ -251,7 +251,7 @@ def bible_korean(request):
         book_name = korean_title.objects.get(Book_ID=book_no).Book
     else:
         date = dt.datetime.today().strftime("%Y-%m-%d")
-        f_date = date.replace('-', '')
+        f_date = date.replace('-', '')[2:]
 
         # if bible_plan == '생명의삶':
         #     daily_bible = living_life.objects.get(Date=date)
