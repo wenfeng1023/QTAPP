@@ -7,7 +7,7 @@
 
 
 {% block content %}
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <div class="modal-body p-5 pt-0">
 <form class='row g-3' method='POST' enctype="multipart/form-data">
     {% csrf_token %}
@@ -18,19 +18,47 @@
 
     </select>
     <h5 class="modal-title">언어선택하기</h5>
-   <select class="form-select" aria-label="Default select example" name='lang_1' required>
+   <select class="form-select" aria-label="Default select example" name='lang_1' id="sel1" onchange="giveSelection(this.value)">
         <option value='한국어'>한국어</option>
         <option value="중국어">중국어</option>
         <option value="영어">영어</option>
     </select>
-    <select class="form-select" aria-label="Default select example" name='lang_2'>
-        <option value='한국어'>한국어</option>
-        <option value="중국어">중국어</option>
-        <option value="영어">영어</option>
-        <option value="히브리어(국약)">히브리어(국약)</option>
-        <option value="그리스어(신약)">그리스어(신약)</option>
+    <select class="form-select" aria-label="Default select example" name='lang_2'id="sel2">
+        <option data-option="한국어">안 선택</option>
+        <option data-option="한국어">중국어</option>
+        <option data-option="한국어">영어</option>
+        <option data-option="한국어">히브리어(국약)</option>
+        <option data-option="한국어">그리스어(신약)</option>
+        
+        <option data-option="중국어">안 선택</option>
+        <option data-option='중국어'>한국어</option>
+        <option data-option="중국어">영어</option>
+        <option data-option="중국어">히브리어(국약)</option>
+        <option data-option="중국어">그리스어(신약)</option>
+
+        <option data-option="영어">안 선택</option>
+        <option data-option='영어'>한국어</option>
+        <option data-option="영어">중국어</option>
+        <option data-option="영어">히브리어(국약)</option>
+        <option data-option="영어">그리스어(신약)</option>
     </select>
     <button class="btn btn-outline-success" type="submit">다음</button>
 </form>
 </div>
+<script>
+    var sel1 = document.querySelector('#sel1');
+    var sel2 = document.querySelector('#sel2');
+    var options2 = sel2.querySelectorAll('option');
+    
+    function giveSelection(selValue) {
+      sel2.innerHTML = '';
+      for(var i = 0; i < options2.length; i++) {
+        if(options2[i].dataset.option === selValue) {
+          sel2.appendChild(options2[i]);
+        }
+      }
+    }
+    
+    giveSelection(sel1.value);
+    </script>
 {% endblock %}

@@ -83,13 +83,13 @@
             {%endif%}
         </h5>
         <br>
-        {%if language_1 != language_2 and language_2 != '히브리어(국약)'%}
+        {%if language_2 != '안 선택' and language_2 != '히브리어(국약)'%}
             {%for text,text2 in fina_scripture%}     
                     <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>  
                     <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>  
                     <br>
             {% endfor %}
-        {%elif language_1 != language_2 and language_2 == '히브리어(국약)'%}
+        {%elif language_2 != '안 선택' and language_2 == '히브리어(국약)'%}
             {%for text,text2 in fina_scripture%}     
                 <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>  
                 <p class='ezra'><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>

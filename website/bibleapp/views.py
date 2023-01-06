@@ -118,7 +118,7 @@ def Bible_ESV(request):
             Chapter=chapter,
             Verse_as_int__range=(start_v, end_v)
         )
-    if language_2 != "영어":
+    if language_2 != "안 선택" and language_2!='영어':
         data = second_lang(request, language_2)
         fina_scripture = zip(scripture, data)
     else:
@@ -204,7 +204,7 @@ def bible_chinese(request):
             Verse_as_int__range=(start_v, end_v)
         )
 
-    if language_2 != "중국어":
+    if language_2 != "안 선택" and language_2!='중국어':
         data = second_lang(request, language_2)
         fina_scripture = zip(scripture, data)
     else:
@@ -305,7 +305,7 @@ def bible_korean(request):
             Chapter=chapter,
             Verse_as_int__range=(start_v, end_v)
         )
-    if language_2 != "한국어":
+    if language_2 != "안 선택" and language_2 != '한국어':
         data = second_lang(request, language_2)
         fina_scripture = zip(scripture, data)
     else:
