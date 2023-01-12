@@ -83,23 +83,63 @@
             {%endif%}
         </h5>
         <br>
-        {%if language_2 != '안 선택' and language_2 != '히브리어(국약)'%}
-            {%for text,text2 in fina_scripture%}     
-                    <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>  
-                    <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>  
+        <!--To know how many language selected-->
+        {%if length == 4 %}
+            {%for text1,text2,text3,text4 in fina_scripture%}
+                <!--Setting Hebrew fonts if include Hebrew Bible-->
+                {%if text4.Book_No < '40'%}
+                    <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>  
+                    <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+                    <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p> 
+                    <p class='ezra'><sup>{{text4.Verse}}</sup>{{text4.Text}}</p>   
                     <br>
+                {%else%}
+                    <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>  
+                    <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+                    <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p> 
+                    <p><sup>{{text4.Verse}}</sup>{{text4.Text}}</p>   
+                    <br>
+                {%endif%}
             {% endfor %}
-        {%elif language_2 != '안 선택' and language_2 == '히브리어(국약)'%}
-            {%for text,text2 in fina_scripture%}     
-                <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>  
-                <p class='ezra'><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
-                <br>
+
+        {%elif length == 3%}
+            {%for text1,text2,text3 in fina_scripture%}
+                {%if text3.Book_No < '40'%}     
+                    <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>  
+                    <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+                    <p class='ezra'><sup>{{text3.Verse}}</sup>{{text3.Text}}</p> 
+                    <br>
+                {%else%}
+                    <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>  
+                    <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+                    <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p> 
+                    <br>
+                    {% endif %}
             {% endfor %}
+
+        {%elif length == 2%}
+            {%for text1,text2 in fina_scripture%}
+                {%if text2.Book_No < '40'%}     
+                    <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>  
+                    <p class='ezra'><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
+                    <br>
+                {%else%}
+                    <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>  
+                    <p><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
+                    <br>
+                {%endif%}
+            {% endfor %}
+
         {%else%}
             {%for text in fina_scripture%}
-            <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
+                {%if text.Book_No < '40'%}
+                    <p class='ezra'><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
+                {%else%}
+                    <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
+                {%endif%}
             {%endfor%}
         {%endif%}
+
         {% for message in messages %}
         <p class='successMsg'>{{message}}</p>
         {% endfor%}
