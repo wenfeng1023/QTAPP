@@ -283,7 +283,7 @@ class DateSave(models.Model):
 class CustomSetting(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     lang_1 = models.CharField(max_length=50)
-    lang_2 = models.CharField(max_length=50,null=True,blank=True)
+    lang_2 = models.CharField(max_length=100,null=True,blank=True)
     bible_plan = models.CharField(max_length=50)
     
     class Meta:

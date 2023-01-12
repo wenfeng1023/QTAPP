@@ -13,29 +13,52 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 import win32clipboard
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 # Create your views here.
+
 
 def setting(request):
     obj = CustomSetting()
     if request.method == 'POST':
         data = CustomSetting.objects.filter(user=request.user)
-        if data.exists():
-            data.delete()
-            select_1 = request.POST['lang_1']
-            select_2 = request.POST['lang_2']
-            obj.user = request.user
-            obj.lang_1 = select_1
-            obj.lang_2 = select_2
-            obj.bible_plan = request.POST['qt']
-            obj.save()
+        checks = request.POST.getlist('checks[]')
+        init_lang = "한국어"
+        if len(checks) == 1:
+            init_lang = checks[0]
+
+        if len(checks) == 0 or len(checks) == 1:
+
+            if data.exists():
+                data.delete()
+                select_1 = init_lang
+                obj.user = request.user
+                obj.lang_1 = select_1
+                obj.bible_plan = request.POST['qt']
+                obj.save()
+            else:
+                select_1 = init_lang
+                obj.user = request.user
+                obj.lang_1 = select_1
+                obj.bible_plan = request.POST['qt']
+                obj.save()
         else:
-            select_1 = request.POST['lang_1']
-            select_2 = request.POST['lang_2']
-            obj.user = request.user
-            obj.lang_1 = select_1
-            obj.lang_2 = select_2
-            obj.bible_plan = request.POST['qt']
-            obj.save()
+            if data.exists():
+                data.delete()
+                select_1 = checks[0]
+                select_2 = ','.join(checks[1:])
+                obj.user = request.user
+                obj.lang_1 = select_1
+                obj.lang_2 = select_2
+                obj.bible_plan = request.POST['qt']
+                obj.save()
+            else:
+                select_1 = checks[0]
+                select_2 = ','.join(checks[1:])
+                obj.user = request.user
+                obj.lang_1 = select_1
+                obj.lang_2 = select_2
+                obj.bible_plan = request.POST['qt']
+                obj.save()
 
         if select_1 == '영어':
             return redirect('bible_esv')
@@ -58,10 +81,11 @@ def Bible_ESV(request):
     bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
     language_1 = CustomSetting.objects.get(user=request.user).lang_1
     language_2 = CustomSetting.objects.get(user=request.user).lang_2
+    length = 1
     if request.method == 'POST':
         date = request.POST.get('date')
         f_date = date.replace('-', '')[2:]
-        daily_bible = bible_plan(request,date)
+        daily_bible = bible_plan(request, date)
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
         daily_verse = daily_bible.Text
@@ -69,7 +93,7 @@ def Bible_ESV(request):
     else:
         date = dt.datetime.today().strftime("%Y-%m-%d")
         f_date = date.replace('-', '')[2:]
-        daily_bible = bible_plan(request,date)
+        daily_bible = bible_plan(request, date)
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
         daily_verse = daily_bible.Text
@@ -118,18 +142,25 @@ def Bible_ESV(request):
             Chapter=chapter,
             Verse_as_int__range=(start_v, end_v)
         )
-    if language_2 != "안 선택" and language_2!='영어':
-        data = second_lang(request, language_2)
-        fina_scripture = zip(scripture, data)
-    else:
+    if language_2 == None or '영어'in language_2:
         fina_scripture = scripture
+    else:
+        language_2 = language_2.split(',')
+        length = len(language_2)+1
+        data = data = second_lang(request, language_2)
+        if len(language_2) == 3:
+            fina_scripture = zip(scripture, data[0], data[1], data[2])
+        elif len(language_2) == 2:
+            fina_scripture = zip(scripture, data[0], data[1])
+        else:
+            fina_scripture = zip(scripture, data[0])
 
     if language_1 == '영어':
         return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
                                               'language_2': language_2,
                                               'daily_verse': daily_verse, 'today': date,
                                               'book_name': book_name, 'f_date': f_date,
-                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture})
+                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length})
     else:
         return scripture
 
@@ -139,14 +170,16 @@ Chinese Bible Version
 '''
 
 
+@login_required
 def bible_chinese(request):
     bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
     language_1 = CustomSetting.objects.get(user=request.user).lang_1
     language_2 = CustomSetting.objects.get(user=request.user).lang_2
+    length = 1
     if request.method == 'POST':
         date = request.POST.get('date')
         f_date = date.replace('-', '')[2:]
-        daily_bible = bible_plan(request,date)
+        daily_bible = bible_plan(request, date)
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
         daily_verse = daily_bible.Text
@@ -154,7 +187,7 @@ def bible_chinese(request):
     else:
         date = dt.datetime.today().strftime("%Y-%m-%d")
         f_date = date.replace('-', '')[2:]
-        daily_bible = bible_plan(request,date)
+        daily_bible = bible_plan(request, date)
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
         daily_verse = daily_bible.Text
@@ -204,18 +237,25 @@ def bible_chinese(request):
             Verse_as_int__range=(start_v, end_v)
         )
 
-    if language_2 != "안 선택" and language_2!='중국어':
-        data = second_lang(request, language_2)
-        fina_scripture = zip(scripture, data)
-    else:
+    if language_2 == None or '중국어' in language_2:
         fina_scripture = scripture
+    else:
+        language_2 = language_2.split(',')
+        length = len(language_2)+1
+        data = data = second_lang(request, language_2)
+        if len(language_2) == 3:
+            fina_scripture = zip(scripture, data[0], data[1], data[2])
+        elif len(language_2) == 2:
+            fina_scripture = zip(scripture, data[0], data[1])
+        else:
+            fina_scripture = zip(scripture, data[0])
 
     if language_1 == '중국어':
         return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
                                               'language_2': language_2,
                                               'daily_verse': daily_verse, 'today': date,
                                               'book_name': book_name, 'f_date': f_date,
-                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture})
+                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length})
     else:
         return scripture
     # return render(request, 'bible.html', {'scripture': scripture,
@@ -230,11 +270,14 @@ Koran Bible. 개역한글
 '''
 
 
+@login_required(login_url='login')
 def bible_korean(request):
     # yesterday = (dt.datetime.today() - timedelta(days=2)).strftime("%Y-%m-%d")
     bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
     language_1 = CustomSetting.objects.get(user=request.user).lang_1
     language_2 = CustomSetting.objects.get(user=request.user).lang_2
+    length = 1
+
     if request.method == 'POST':
         date = request.POST.get('date')
         f_date = date.replace('-', '')[2:]
@@ -243,7 +286,7 @@ def bible_korean(request):
         #     daily_bible = living_life.objects.get(Date=date)
         # else:
         #     daily_bible = Daily_Bible.objects.get(Date=date)
-        daily_bible = bible_plan(request,date)
+        daily_bible = bible_plan(request, date)
 
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
@@ -257,7 +300,7 @@ def bible_korean(request):
         #     daily_bible = living_life.objects.get(Date=date)
         # else:
         #     daily_bible = Daily_Bible.objects.get(Date=date)
-        daily_bible = bible_plan(request,date)
+        daily_bible = bible_plan(request, date)
 
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
@@ -305,18 +348,28 @@ def bible_korean(request):
             Chapter=chapter,
             Verse_as_int__range=(start_v, end_v)
         )
-    if language_2 != "안 선택" and language_2 != '한국어':
-        data = second_lang(request, language_2)
-        fina_scripture = zip(scripture, data)
-    else:
+    if language_2 == None:
         fina_scripture = scripture
+    else:
+        language_2 = language_2.split(',')
+        length = len(language_2)+1
+        data = data = second_lang(request, language_2)
+        if data:
+            if len(language_2) == 3:
+                fina_scripture = zip(scripture, data[0], data[1], data[2])
+            elif len(language_2) == 2:
+                fina_scripture = zip(scripture, data[0], data[1])
+            else:
+                fina_scripture = zip(scripture, data[0])
+        else:
+            fina_scripture = scripture
 
     if language_1 == '한국어':
         return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
                                               'language_2': language_2,
                                               'daily_verse': daily_verse, 'today': date,
                                               'book_name': book_name, 'f_date': f_date,
-                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture})
+                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length})
     else:
         return scripture
 
@@ -327,17 +380,23 @@ GreeK Bible(NT).
 
 
 def bible_greek(request):
+    bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
+    language_1 = CustomSetting.objects.get(user=request.user).lang_1
+    language_2 = CustomSetting.objects.get(user=request.user).lang_2
+    length = 1
 
     if request.method == 'POST':
         date = request.POST.get('date')
-        daily_bible = bible_plan(request,date)
+        f_date = date.replace('-', '')[2:]
+        daily_bible = bible_plan(request, date)
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
         daily_verse = daily_bible.Text
         book_name = korean_title.objects.get(Book_ID=book_no).Book
     else:
         date = dt.datetime.today().strftime("%Y-%m-%d")
-        daily_bible = bible_plan(request,date)
+        f_date = date.replace('-', '')[2:]
+        daily_bible = bible_plan(request, date)
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
         daily_verse = daily_bible.Text
@@ -374,7 +433,6 @@ def bible_greek(request):
                 Chapter_as_int__range=(start_ch, end_ch),
                 id__range=(strat_id, end_id),
             )
-            return render(request, 'bible_original.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': date, 'book_name': book_name})
         else:
             text = (daily_bible.Text).split(":")
             chapter = int(text[0])
@@ -387,12 +445,49 @@ def bible_greek(request):
                 Chapter=chapter,
                 Verse_as_int__range=(start_v, end_v)
             )
-            return scripture
 
+        if language_2 == None or '그리스어(신약)' in language_2:
+            fina_scripture = scripture
+        else:
+            language_2 = language_2.split(',')
+            length = len(language_2)+1
+            data = data = second_lang(request, language_2)
+            if len(language_2) == 3:
+                fina_scripture = zip(scripture, data[0], data[1], data[2])
+            elif len(language_2) == 2:
+                fina_scripture = zip(scripture, data[0], data[1])
+            else:
+                fina_scripture = zip(scripture, data[0])
+
+        if language_1 == '그리스어(신약)':
+            return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
+                                                  'language_2': language_2,
+                                                  'daily_verse': daily_verse, 'today': date,
+                                                  'book_name': book_name, 'f_date': f_date,
+                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length})
+        else:
+            return scripture
     else:
-        messages.info(request, "오늘 신약 말씀이 아니다,그리스어없다!!")
-        scripture = "오늘 신약 말씀이 아니다,그리스어없다!!"
-        return scripture
+        if language_1 != '그리스어(신약)':
+            scripture = '오늘 신약 말씀이 아니다,그리스어없다!'
+            return scripture
+        
+        else:
+            scripture = '오늘 신약 말씀이 아니다,그리스어없다!'
+            return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
+                                                    'language_2': language_2,
+                                                    'daily_verse': daily_verse, 'today': date,
+                                                    'book_name': book_name, 'f_date': f_date,
+                                                    'bible_qt': bible_qt,})
+       
+
+    # else:
+    #     messages.info(request, "오늘 신약 말씀이 아니다,그리스어없다!!")
+    #     scripture = "오늘 신약 말씀이 아니다,그리스어없다!!"
+    #     return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
+    #                                               'language_2': language_2,
+    #                                               'daily_verse': daily_verse, 'today': date,
+    #                                               'book_name': book_name, 'f_date': f_date,})
 
         # return render(request, 'bible_original.html', {'today': date, })
 
@@ -405,17 +500,23 @@ Modern Israeli Hebrew compilation from Westmister (OT) and Modern Hebrew(NT).
 
 
 def bible_hebrew(request):
+    bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
+    language_1 = CustomSetting.objects.get(user=request.user).lang_1
+    language_2 = CustomSetting.objects.get(user=request.user).lang_2
+    length = 1
 
     if request.method == 'POST':
         date = request.POST.get('date')
-        daily_bible = bible_plan(request,date)
+        f_date = date.replace('-', '')[2:]
+        daily_bible = bible_plan(request, date)
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
         daily_verse = daily_bible.Text
         book_name = korean_title.objects.get(Book_ID=book_no).Book
     else:
         date = dt.datetime.today().strftime("%Y-%m-%d")
-        daily_bible = bible_plan(request,date)
+        f_date = date.replace('-', '')[2:]
+        daily_bible = bible_plan(request, date)
         book_no = daily_bible.Book_No
         cont = (daily_bible.Text).count(":")
         daily_verse = daily_bible.Text
@@ -453,7 +554,6 @@ def bible_hebrew(request):
                 Chapter_as_int__range=(start_ch, end_ch),
                 id__range=(strat_id, end_id),
             )
-            return render(request, 'bible_original.html', {'scripture': scripture, 'daily_verse': daily_verse, 'today': date, 'book_name': book_name})
         else:
             text = (daily_bible.Text).split(":")
             chapter = int(text[0])
@@ -466,12 +566,40 @@ def bible_hebrew(request):
                 Chapter=chapter,
                 Verse_as_int__range=(start_v, end_v)
             )
+        if language_2 == None or '히브리어(국약)'in language_2:
+            fina_scripture = scripture
+        else:
+            language_2 = language_2.split(',')
+            length = len(language_2)+1
+            data = data = second_lang(request, language_2)
+            if len(language_2) == 3:
+                fina_scripture = zip(scripture, data[0], data[1], data[2])
+            elif len(language_2) == 2:
+                fina_scripture = zip(scripture, data[0], data[1])
+            else:
+                fina_scripture = zip(scripture, data[0])
+
+        if language_1 == '히브리어(국약)':
+            return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
+                                                  'language_2': language_2,
+                                                  'daily_verse': daily_verse, 'today': date,
+                                                  'book_name': book_name, 'f_date': f_date,
+                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length})
+        else:
             return scripture
     else:
-        messages.info(request, '오늘 구약 말씀이 아니다,히브리어없다!')
-        scripture = '오늘 구약 말씀이 아니다,히브리어없다!'
-        return scripture
-        
+        if language_1 !='히브리어(국약)':
+            scripture = '오늘 구약 말씀이 아니다,히브리어없다!'
+            return scripture
+        else:
+            messages.info(request, '오늘 구약 말씀이 아니다,히브리어없다!')
+            scripture = '오늘 구약 말씀이 아니다,히브리어없다!'
+            return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
+                                                    'language_2': language_2,
+                                                    'daily_verse': daily_verse, 'today': date,
+                                                    'book_name': book_name, 'f_date': f_date,
+                                                    'bible_qt': bible_qt,})
+
         # return render(request, 'bible_original.html', {'today': date, })
 
 
@@ -545,18 +673,18 @@ def add_meditaion(request):
     else:
         if data.lang_1 == '한국어':
             today = dt.datetime.today().strftime("%Y-%m-%d")
-            daily_bible = bible_plan(request,date)
+            daily_bible = bible_plan(request, date)
             book_no = daily_bible.Book_No
             daily_verse = daily_bible.Text
             book_name = korean_title.objects.get(Book_ID=book_no).Book
             scripture = book_name + " " + daily_verse
             # scripture = scripture_data
             m_form = MyMeditationForm(
-                initial={'scripture': scripture, 'choice': 1,'created_date':date})
+                initial={'scripture': scripture, 'choice': 1, 'created_date': date})
             return render(request, 'meditation.html', {'m_form': m_form})
         else:
             today = dt.datetime.today().strftime("%Y-%m-%d")
-            daily_bible = bible_plan(request,date)
+            daily_bible = bible_plan(request, date)
             book_no = daily_bible.Book_No
             book_name = English_ESV.objects.filter(
                 Book_No=book_no).first().Book
@@ -564,7 +692,7 @@ def add_meditaion(request):
             scripture = book_name + " " + daily_verse
             # scripture = scripture_data
             m_form = MyMeditationForm(
-                initial={'scripture': scripture, 'choice': 1,'created_date':date})
+                initial={'scripture': scripture, 'choice': 1, 'created_date': date})
             return render(request, 'meditation.html', {'m_form': m_form})
 
 
@@ -885,24 +1013,28 @@ def remove(request):
 
 
 def second_lang(request, lang):
-    if lang == '영어':
-        data = Bible_ESV(request)
-        return data
-    elif lang == '한국어':
-        data = bible_korean(request)
-        return data
-    elif lang == '중국어':
-        data = bible_chinese(request)
-        return data
-    elif lang == '히브리어(국약)':
-        data = bible_hebrew(request)
-        return data
-    else:
-        data = bible_greek(request)
-        return data
+    data = []
+    for l in lang:
+
+        if l == '영어':
+            data_1 = Bible_ESV(request)
+            data.append(data_1)
+        elif l == '중국어':
+            data_2 = bible_chinese(request)
+            data.append(data_2)
+        elif l == '히브리어(국약)':
+            data_3 = bible_hebrew(request)
+            data.append(data_3)
+        else:
+            data_4 = bible_greek(request)
+            data.append(data_4)
+    return data
+
 
 '''Deal with daily bible plan'''
-def bible_plan(request,date):
+
+
+def bible_plan(request, date):
     bible_plan = CustomSetting.objects.get(user=request.user).bible_plan
 
     if bible_plan == '생명의삶':

@@ -2,27 +2,26 @@
 {% block title %}
 <title>Book Site | Book Detail </title>
 {% endblock %}
-
-
-
-
 {% block content %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <div class="modal-body p-5 pt-0">
-<form class='row g-3' method='POST' enctype="multipart/form-data">
+  <form class='row g-3' method='POST' enctype="multipart/form-data">
     {% csrf_token %}
     <h5 class="modal-title">성경선택하기</h5>
     <select class="form-select" aria-label="Default select example" name='qt' required>
-        <option value='매일성경 읽기'>매일성경 읽기</option>
-        <option value='생명의삶'>생명의삶</option>
+      <option value='매일성경 읽기'>매일성경 읽기</option>
+      <option value='생명의삶'>생명의삶</option>
 
     </select>
     <h5 class="modal-title">언어선택하기</h5>
+    <!--
    <select class="form-select" aria-label="Default select example" name='lang_1' id="sel1" onchange="giveSelection(this.value)">
         <option value='한국어'>한국어</option>
         <option value="중국어">중국어</option>
         <option value="영어">영어</option>
     </select>
+    -->
+    <!--
     <select class="form-select" aria-label="Default select example" name='lang_2'id="sel2">
         <option data-option="한국어">안 선택</option>
         <option data-option="한국어">중국어</option>
@@ -42,23 +41,71 @@
         <option data-option="영어">히브리어(국약)</option>
         <option data-option="영어">그리스어(신약)</option>
     </select>
+    -->
+    <div class="form-check form-switch" name='kr'>
+      <input class="form-check-input" type="checkbox" name='checks[]' value='한국어' id="flexSwitchCheckDefault">
+      <label class="form-check-label" for="flexSwitchCheckDefault">한국어</label>
+    </div>
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" name='checks[]' value='중국어' id="flexSwitchCheckChecked">
+      <label class="form-check-label" for="flexSwitchCheckChecked">중국어</label>
+    </div>
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" name='checks[]' value='영어' id="flexSwitchCheckChecked">
+      <label class="form-check-label" for="flexSwitchCheckChecked">영어</label>
+    </div>
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" name='checks[]' value='히브리어(국약)' id="hebrewChecked">
+      <label class="form-check-label" for="flexSwitchCheckChecked">히브리어(국약)</label>
+    </div>
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" name='checks[]' value='그리스어(신약)' id="greekChecked">
+      <label class="form-check-label" for="flexSwitchCheckChecked">그리스어(신약)</label>
+    </div>
+
+
     <button class="btn btn-outline-success" type="submit">다음</button>
-</form>
+  </form>
 </div>
+<!--
 <script>
-    var sel1 = document.querySelector('#sel1');
-    var sel2 = document.querySelector('#sel2');
-    var options2 = sel2.querySelectorAll('option');
-    
-    function giveSelection(selValue) {
-      sel2.innerHTML = '';
-      for(var i = 0; i < options2.length; i++) {
-        if(options2[i].dataset.option === selValue) {
-          sel2.appendChild(options2[i]);
-        }
+  var sel1 = document.querySelector('#sel1');
+  var sel2 = document.querySelector('#sel2');
+  var options2 = sel2.querySelectorAll('option');
+
+  function giveSelection(selValue) {
+    sel2.innerHTML = '';
+    for (var i = 0; i < options2.length; i++) {
+      if (options2[i].dataset.option === selValue) {
+        sel2.appendChild(options2[i]);
       }
     }
-    
-    giveSelection(sel1.value);
-    </script>
+  }
+
+  giveSelection(sel1.value);
+</script>
+-->
+<script>
+  // get first checkbox element
+  let box1 = document.getElementById('hebrewChecked')
+  
+  // get second checkbox element
+  let box2 = document.getElementById("greekChecked");
+
+  // add events that fires when boxes are checked
+  box1.addEventListener("change", function () {
+
+    // see if the other box is already checked
+    if (box2.checked) {
+
+      // if so, uncheck it
+      box2.checked = false;
+    }
+  });
+  box2.addEventListener("change", function () {
+    if (box1.checked) {
+      box1.checked = false;
+    }
+  });
+</script>
 {% endblock %}
