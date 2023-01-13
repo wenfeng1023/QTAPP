@@ -78,10 +78,13 @@ def setting(request):
 
 @login_required(login_url='login')
 def Bible_ESV(request):
-    bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
-    language_1 = CustomSetting.objects.get(user=request.user).lang_1
-    language_2 = CustomSetting.objects.get(user=request.user).lang_2
-    length = 1
+    try:
+        bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
+        language_1 = CustomSetting.objects.get(user=request.user).lang_1
+        language_2 = CustomSetting.objects.get(user=request.user).lang_2
+        length = 1
+    except:
+        return redirect("setting")
     if request.method == 'POST':
         date = request.POST.get('date')
         f_date = date.replace('-', '')[2:]
@@ -170,10 +173,13 @@ Chinese Bible Version
 '''
 @login_required(login_url='login')
 def bible_chinese(request):
-    bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
-    language_1 = CustomSetting.objects.get(user=request.user).lang_1
-    language_2 = CustomSetting.objects.get(user=request.user).lang_2
-    length = 1
+    try:
+        bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
+        language_1 = CustomSetting.objects.get(user=request.user).lang_1
+        language_2 = CustomSetting.objects.get(user=request.user).lang_2
+        length = 1
+    except:
+        return redirect("setting")
     if request.method == 'POST':
         date = request.POST.get('date')
         f_date = date.replace('-', '')[2:]
@@ -388,10 +394,14 @@ GreeK Bible(NT).
 
 @login_required(login_url='login')
 def bible_greek(request):
-    bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
-    language_1 = CustomSetting.objects.get(user=request.user).lang_1
-    language_2 = CustomSetting.objects.get(user=request.user).lang_2
-    length = 1
+    try:
+
+        bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
+        language_1 = CustomSetting.objects.get(user=request.user).lang_1
+        language_2 = CustomSetting.objects.get(user=request.user).lang_2
+        length = 1
+    except:
+        return redirect("setting")
 
     if request.method == 'POST':
         date = request.POST.get('date')
@@ -508,10 +518,13 @@ Modern Israeli Hebrew compilation from Westmister (OT) and Modern Hebrew(NT).
 
 @login_required(login_url='login')
 def bible_hebrew(request):
-    bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
-    language_1 = CustomSetting.objects.get(user=request.user).lang_1
-    language_2 = CustomSetting.objects.get(user=request.user).lang_2
-    length = 1
+    try:
+        bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
+        language_1 = CustomSetting.objects.get(user=request.user).lang_1
+        language_2 = CustomSetting.objects.get(user=request.user).lang_2
+        length = 1
+    except:
+        return redirect("setting")
 
     if request.method == 'POST':
         date = request.POST.get('date')
