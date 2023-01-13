@@ -31,9 +31,9 @@
     @font-face {
         font-family: 'Ezra SIL SR';
         src: url({%static 'fonts/ezrasilsr-webfont.eot'%}?#iefix) format('embedded-opentype'),
-            url({%static 'fonts/ezrasilsr-webfont.woff'%}) format('woff'),
-            url({%static 'fonts/ezrasilsr-webfont.ttf'%}') format('truetype'),
-            url({%static 'fonts/ezrasilsr-webfont.svg#EzraSILSR'%}) format('svg');
+        url({%static 'fonts/ezrasilsr-webfont.woff'%}) format('woff'),
+        url({%static 'fonts/ezrasilsr-webfont.ttf'%}') format('truetype'),
+        url({%static 'fonts/ezrasilsr-webfont.svg#EzraSILSR'%}) format('svg');
     }
 
     .ezra {
@@ -57,119 +57,147 @@
         <button class='button button2' id="next" style="border:none"><img src="{%static 'img/right-arrow.png'%}"
                 width="15" height="15"></button>
         <!--<div id="datePicker" onchange="submit();"></div>-->
-
     </form>
-    <!--
-    <a href="{%url 'copy_past'%}">
-        <button class="btn btn-default" type="button" id="copy-button" onclick="CopyToClipboard('editor1')"
-            data-toggle="tooltip" data-placement="button" title="Copy to Clipboard">
-            Copy
-        </button>
-        <a>
-            -->
+
+
+    <button class="btn btn-default" type="button" id="copy-button" onclick="CopyToClipboard('editor1')"
+        data-toggle="tooltip" data-placement="button" title="Copy to Clipboard">
+        Copy
+    </button>
+
+
 </div>
 <div class="modal-body p-5 pt-0">
     <!--<button id="button1" onclick="CopyToClipboard('editor1')">COPY</button> -->
     <div id='editor1' class="form-floating mb-3">
         <h5 class="fw-bold mb-0">{{today}} {{book_name}} {{daily_verse}}
             {%if bible_qt == '생명의삶'%}
-            <a href = "http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4" target="_blank">
-                <img src = "{% static 'img/icons8-link-16.png'%}">
+            <a href="http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4" target="_blank">
+                <img src="{% static 'img/icons8-link-16.png'%}">
             </a>
             {%else%}
-            <a href = "https://sum.su.or.kr:8888/bible/today" target="_blank">
-                <img src = "{% static 'img/icons8-link-16.png'%}">
+            <a href="https://sum.su.or.kr:8888/bible/today" target="_blank">
+                <img src="{% static 'img/icons8-link-16.png'%}">
             </a>
             {%endif%}
         </h5>
         <br>
         <!--To know how many language selected-->
         {%if length == 4 %}
-            {%for text1,text2,text3,text4 in fina_scripture%}
-                <!--Setting Hebrew fonts if include Hebrew Bible-->
-                {%if text4.Book_No < '40'%}
-                    <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>  
-                    <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
-                    <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p> 
-                    <p class='ezra'><sup>{{text4.Verse}}</sup>{{text4.Text}}</p>   
-                    <br>
-                {%else%}
-                    <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>  
-                    <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
-                    <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p> 
-                    <p><sup>{{text4.Verse}}</sup>{{text4.Text}}</p>   
-                    <br>
-                {%endif%}
-            {% endfor %}
+        {%for text1,text2,text3,text4 in fina_scripture%}
+        <!--Setting Hebrew fonts if include Hebrew Bible-->
+        {%if text4.Book_No < '40'%}
+        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+        <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
+        <p class='ezra'><sup>{{text4.Verse}}</sup>{{text4.Text}}</p>
+        <br>
+        {%else%}
+        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+        <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
+        <p><sup>{{text4.Verse}}</sup>{{text4.Text}}</p>
+        <br>
+        {%endif%}
+        {% endfor %}
 
         {%elif length == 3%}
-            {%for text1,text2,text3 in fina_scripture%}
-                {%if text3.Book_No < '40'%}     
-                    <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>  
-                    <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
-                    <p class='ezra'><sup>{{text3.Verse}}</sup>{{text3.Text}}</p> 
-                    <br>
-                {%else%}
-                    <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>  
-                    <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
-                    <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p> 
-                    <br>
-                    {% endif %}
-            {% endfor %}
+        {%for text1,text2,text3 in fina_scripture%}
+        {%if text3.Book_No < '40'%}
+        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+        <p class='ezra'><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
+        <br>
+        {%else%}
+        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+        <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
+        <br>
+        {% endif %}
+        {% endfor %}
 
         {%elif length == 2%}
-            {%for text1,text2 in fina_scripture%}
-                {%if text2.Book_No < '40'%}     
-                    <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>  
-                    <p class='ezra'><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
-                    <br>
-                {%else%}
-                    <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>  
-                    <p><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
-                    <br>
-                {%endif%}
-            {% endfor %}
+        {%for text1,text2 in fina_scripture%}
+        {%if text2.Book_No < '40'%}
+        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+        <p class='ezra'><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
+        <br>
+        {%else%}
+        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+        <p><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
+        <br>
+        {%endif%}
+        {% endfor %}
 
         {%else%}
-            {%for text in fina_scripture%}
-                {%if text.Book_No < '40'%}
-                    <p class='ezra'><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
-                {%else%}
-                    <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
-                {%endif%}
-            {%endfor%}
+        {%for text in fina_scripture%}
+        {%if text.Book_No < '40'%}
+        <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
+        {%else%}
+        <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
         {%endif%}
-
-        {% for message in messages %}
-        <p class='successMsg'>{{message}}</p>
-        {% endfor%}
+        {%endfor%}
+        {%endif%}
     </div>
-     <button id="copy-button" type="submit" class="btn btn-outline-primary btn-sm" onclick="event.preventDefault();document.getElementById('magic-form').submit();">나의묵상글 등록하기</button> 
+    <button id="copy-button" type="submit" class="btn btn-outline-primary btn-sm"
+        onclick="event.preventDefault();document.getElementById('magic-form').submit();">나의묵상글 등록하기</button>
     <a href="{%url 'prayer'%}">
         <button type="button" class="btn btn-outline-primary btn-sm">나의기도등록하기</button>
     </a>
 </div>
 <form id="magic-form" action="{%url 'meditation'%}" method="GET" style="display: none;">
-    {% csrf_token %} <!-- from your framework -->
-  <input type="hidden" name="new_date" value="{{today}}" />
-  <!-- other fields -->
+    {% csrf_token %}
+    <!-- from your framework -->
+    <input type="hidden" name="new_date" value="{{today}}" />
+    <!-- other fields -->
 </form>
 <script>
     function testClipboard() {
         navigator.clipboard.writeText("Clipboard API Test").then(
-           v => alert("Success"),
-           e => alert("Fail\n" + e));
-     }
+            v => alert("Success"),
+            e => alert("Fail\n" + e));
+    }
     // add url when someone copied text
-    /*
-    document.addEventListener('copy', function (e) {
+
+    {% comment %} document.addEventListener('copy', function (e) {
         var selection = window.getSelection();
         e.clipboardData.setData('text/plain', $('<div/>').html(selection + "").text() + "\n\n" + 'Source: ' +
             document.location.href);
         e.clipboardData.setData('text/html', selection + '<br /><br /><a href="' + document.location.href +
             '">Source</a>');
         e.preventDefault();
-    });**/
+    }); {% endcomment %}
+
+    function CopyToClipboard(id) {
+        var r = document.createRange();
+        r.selectNode(document.getElementById(id));
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(r);
+        try {
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            console.log('Successfully copy text: hello world ' + r);
+        } catch (err) {
+            console.log('Unable to copy!');
+        }
+    }
+</script>
+<!--share-->
+<script>
+    $('#copy-button').on('click', () => {
+        if (navigator.share) {
+          navigator.share({
+              title: 'Web Share API Draft',
+              text: 'Take a look at this spec!',
+              url: 'https://wicg.github.io/web-share/#share-method',
+            })
+            .then(() => console.log('Successful share'))
+            .catch((error) => console.log('Error sharing', error));
+        } else {
+          console.log('Share not supported on this browser, do it the old way.');
+        }
+      });
+      
 </script>
 <script>
     $(document).ready(function () {
@@ -191,10 +219,10 @@
     jQuery(document).ready(function () {
         $("#datePicker").datepicker({
             dateFormat: 'yy-mm-dd',
-            changeMonth:true,
-            changeYear:true,
+            changeMonth: true,
+            changeYear: true,
             minDate: new Date("2023"),
-            maxDate: "+3w"    
+            maxDate: "+3w"
         });
         $("#datePicker").datepicker().on("click", function () {
             var dTxt = $(this).data('dptxt');

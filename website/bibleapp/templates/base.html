@@ -1,3 +1,4 @@
+{% load socialaccount %}
 {%load static%}
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +16,7 @@
         integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
 
     <!-- Custom styles for this template -->
-    <link href="{% static 'css/modals.css' %}" rel="stylesheet">
+    <link href="{% static 'css/modals.css' %}" rel="stylesheet" type="text/css">
     <style>
         .bd-placeholder-img {
             font-size: 1.125rem;
@@ -30,6 +31,7 @@
                 font-size: 3.5rem;
             }
         }
+
         .b-example-divider {
             height: 3rem;
             background-color: rgba(0, 0, 0, .1);
@@ -66,6 +68,7 @@
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
         }
+
         .avatar {
             vertical-align: middle;
             width: 50px;
@@ -75,13 +78,14 @@
             background-position: center center;
             background-size: cover;
         }
-        body {margin:0;}
 
+        body {
+            margin: 0;
+        }
     </style>
 </head>
 
 <body>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
     </script>
@@ -96,7 +100,8 @@
 
                     <!--navbarOffcanvasLg-->
                     <a class="navbar-brand" href="#">Neo 큐티365</a>
-              
+
+
                     <button class="css-1huvtgw" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" stroke="#777" fill="none"
@@ -110,6 +115,7 @@
                             </g>
                         </svg>
                     </button>
+              
                     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight"
                         aria-labelledby="offcanvasRightLabel">
                         <div class="offcanvas-header">
@@ -119,19 +125,22 @@
                         </div>
                         <div class="offcanvas-body small">
                             {%if user.is_authenticated%}
-          
-                                <img src="{{user.user_profile.profile_img.url}}" class="avatar rounded-circle">{{user.username}}
-                            
-                       
+
+                            <img src="{{user.user_profile.profile_img.url}}"
+                                class="avatar rounded-circle">{{user.username}}
+
+
                             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                                 <li class="nav-item">
                                     <a class="nav-link active" aria-current="page" href="{%url 'login'%}">오늘말씀</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="{%url 'p_meditation'%}">나의묵상</a>
+                                    <a class="nav-link active" aria-current="page"
+                                        href="{%url 'p_meditation'%}">나의묵상</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="{%url 'show_meditation'%}">모두묵상</a>
+                                    <a class="nav-link active" aria-current="page"
+                                        href="{%url 'show_meditation'%}">모두묵상</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link active" aria-current="page" href="{%url 'my_prayer'%}">나의기도</a>
@@ -157,19 +166,33 @@
                             <button type="button" class="btn btn-outline-danger btn-lg btn-block"><a
                                     class="dropdown-item" href="{% url 'account_logout' %}">로그아웃</a></button>
                             {%else%}
-                            <p></p>
+                            <h3> Please Login with kakao</h3>
+                            <form action="{% provider_login_url 'kakao' method='oauth2'%}" method="post">
+                                {% csrf_token %}
+
+                                <button class="w-100 py-2 mb-2 btn btn-outline-secondary rounded-3" type="submit">
+
+                                    <svg class="bi me-1" width="16" height="16">
+                                        <img src="{% static 'img/kakao_login.png' %}"></svg>
+                                </button>
+
+                            </form>
                             {%endif%}
                         </div>
+                        {% for message in messages %}
+                        <p class='successMsg'>{{message}}</p>
+                        {% endfor%}
                     </div>
-
+       
                 </div>
+  
                 {% block content %}
-                
-                
+
+
                 {% endblock %}
             </div>
         </div>
-    
+
     </div>
 
 </body>

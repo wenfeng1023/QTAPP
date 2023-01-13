@@ -16,7 +16,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 
-
+@login_required(login_url='login')
 def setting(request):
     obj = CustomSetting()
     if request.method == 'POST':
@@ -76,7 +76,7 @@ def setting(request):
 
 '''English Bible ESV Version '''
 
-
+@login_required(login_url='login')
 def Bible_ESV(request):
     bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
     language_1 = CustomSetting.objects.get(user=request.user).lang_1
@@ -168,9 +168,7 @@ def Bible_ESV(request):
 '''
 Chinese Bible Version
 '''
-
-
-@login_required
+@login_required(login_url='login')
 def bible_chinese(request):
     bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
     language_1 = CustomSetting.objects.get(user=request.user).lang_1
@@ -270,13 +268,23 @@ Koran Bible. 개역한글
 '''
 
 
-@login_required(login_url='login')
+
 def bible_korean(request):
     # yesterday = (dt.datetime.today() - timedelta(days=2)).strftime("%Y-%m-%d")
-    bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
-    language_1 = CustomSetting.objects.get(user=request.user).lang_1
-    language_2 = CustomSetting.objects.get(user=request.user).lang_2
-    length = 1
+    if request.user.is_authenticated:
+        try:
+            bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
+            language_1 = CustomSetting.objects.get(user=request.user).lang_1
+            language_2 = CustomSetting.objects.get(user=request.user).lang_2
+            length = 1
+        except:
+            return redirect("setting")
+
+    else:
+        bible_qt = "매일성경 읽기"
+        language_1 = "한국어"
+        language_2 = None
+        length = 1
 
     if request.method == 'POST':
         date = request.POST.get('date')
@@ -378,7 +386,7 @@ def bible_korean(request):
 GreeK Bible(NT).
 '''
 
-
+@login_required(login_url='login')
 def bible_greek(request):
     bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
     language_1 = CustomSetting.objects.get(user=request.user).lang_1
@@ -498,7 +506,7 @@ Modern Israeli Hebrew compilation from Westmister (OT) and Modern Hebrew(NT).
 
 '''
 
-
+@login_required(login_url='login')
 def bible_hebrew(request):
     bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
     language_1 = CustomSetting.objects.get(user=request.user).lang_1
@@ -624,7 +632,7 @@ def login(request):
     else:
         return render(request, 'login.html', {})
 
-
+@login_required(login_url='login')
 def user_profile(request):
     user = User_Profile.objects.get(user=request.user)
     old_img = user.profile_img.url
@@ -651,7 +659,7 @@ def user_profile(request):
     Add a New meditation
 '''
 
-
+@login_required(login_url='login')
 def add_meditaion(request):
     data = CustomSetting.objects.filter(user=request.user).first()
     date = request.GET.get('new_date')
@@ -700,7 +708,7 @@ def add_meditaion(request):
     add prayer request
 '''
 
-
+@login_required(login_url='login')
 def prayer(request):
     if request.method == 'POST':
         P_form = PrayerForm(request.POST)
@@ -721,7 +729,7 @@ def prayer(request):
     show my prayer request
 '''
 
-
+@login_required(login_url='login')
 def my_prayer(request):
     today = dt.datetime.today().strftime('%Y-%m-%d')
     year_date = list(Prayer.objects.filter(owner=request.user.id, created_date__year=str(
@@ -745,7 +753,7 @@ def my_prayer(request):
     show all prayers
 '''
 
-
+@login_required(login_url='login')
 def show_prayer(request):
     today = dt.datetime.today().strftime('%Y-%m-%d')
     year_date = list(Prayer.objects.filter(choice='1', created_date__year=str(
@@ -769,7 +777,7 @@ def show_prayer(request):
     update my prayer
 '''
 
-
+@login_required(login_url='login')
 def u_prayer(request, id):
     obj = Prayer.objects.get(id=id)
     if request.method == 'POST':
@@ -790,7 +798,7 @@ def u_prayer(request, id):
     show the user's meditation
 '''
 
-
+@login_required(login_url='login')
 def show_meditation(request, *args, **kwargs):
     # print(slug)
     comments = Comments.objects.all()
@@ -844,7 +852,7 @@ def show_meditation(request, *args, **kwargs):
     show personal meditations
 '''
 
-
+@login_required(login_url='login')
 def p_meditation(request):
     today = dt.datetime.today().strftime('%Y-%m-%d')
     year_date = list(My_Meditation.objects.filter(owner=request.user.id, created_date__year=str(
@@ -867,7 +875,7 @@ def p_meditation(request):
     upatea personal meditaions
 '''
 
-
+@login_required(login_url='login')
 def u_meditation(request, id):
     obj = My_Meditation.objects.get(id=id)
     if request.method == 'POST':
@@ -1035,10 +1043,14 @@ def second_lang(request, lang):
 
 
 def bible_plan(request, date):
-    bible_plan = CustomSetting.objects.get(user=request.user).bible_plan
+    if request.user.is_authenticated:
 
-    if bible_plan == '생명의삶':
-        daily_bible = living_life.objects.get(Date=date)
+        bible_plan = CustomSetting.objects.get(user=request.user).bible_plan
+
+        if bible_plan == '생명의삶':
+            daily_bible = living_life.objects.get(Date=date)
+        else:
+            daily_bible = Daily_Bible.objects.get(Date=date)
     else:
         daily_bible = Daily_Bible.objects.get(Date=date)
     return daily_bible
