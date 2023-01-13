@@ -64,8 +64,7 @@
         data-toggle="tooltip" data-placement="button" title="Copy to Clipboard">
         Copy
     </button>
-
-
+    <p class="result"></p>
 </div>
 <div class="modal-body p-5 pt-0">
     <!--<button id="button1" onclick="CopyToClipboard('editor1')">COPY</button> -->
@@ -168,37 +167,63 @@
         e.preventDefault();
     }); {% endcomment %}
 
-    function CopyToClipboard(id) {
+     function CopyToClipboard(id) {
         var r = document.createRange();
         r.selectNode(document.getElementById(id));
+    
         window.getSelection().removeAllRanges();
         window.getSelection().addRange(r);
         try {
             document.execCommand('copy');
             window.getSelection().removeAllRanges();
-            console.log('Successfully copy text: hello world ' + r);
+        
+            //console.log('Successfully copy text: hello world '+r);
         } catch (err) {
             console.log('Unable to copy!');
         }
-    }
+    }  
 </script>
 <!--share-->
 <script>
-    $('#copy-button').on('click', () => {
-        if (navigator.share) {
-          navigator.share({
-              title: 'Web Share API Draft',
-              text: 'Take a look at this spec!',
-              url: 'https://wicg.github.io/web-share/#share-method',
-            })
-            .then(() => console.log('Successful share'))
-            .catch((error) => console.log('Error sharing', error));
-        } else {
-          console.log('Share not supported on this browser, do it the old way.');
+    function CopyToClipboard(id) {
+        var r = document.createRange();
+        r.selectNode(document.getElementById(id));
+    
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(r);
+        try {
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+
+            const shareData = {
+                title: 'MDN',
+                text: r,
+                url: 'https://developer.mozilla.org'
+              }
+              
+              const btn = document.getElementById('copy-button');
+              const resultPara = document.querySelector('.result');
+              try {
+                navigator.share(shareData);
+                resultPara.textContent = 'MDN shared successfully';
+              } catch (err) {
+                resultPara.textContent = `Error: ${err}`;
+              }
+              // Share must be triggered by "user activation"
+             // btn.addEventListener('click', async () => {
+   
+             // });
+        
+            //console.log('Successfully copy text: hello world '+r);
+        } catch (err) {
+            console.log('Unable to copy!');
         }
-      });
-      
+    }  
+    
+   
+    
 </script>
+
 <script>
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').hover(function () {
@@ -209,6 +234,7 @@
         });
     });
 </script>
+
 <!--datepicker JS code-->
 <script type="text/javascript">
     //var disabledDays = {{mark_date | safe}};
