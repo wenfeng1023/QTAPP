@@ -361,7 +361,7 @@ def bible_korean(request):
     else:
         language_2 = language_2.split(',')
         length = len(language_2)+1
-        data = data = second_lang(request, language_2)
+        data = second_lang(request, language_2)
         if data:
             if len(language_2) == 3:
                 fina_scripture = zip(scripture, data[0], data[1], data[2])
