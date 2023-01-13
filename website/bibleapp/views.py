@@ -158,7 +158,7 @@ def Bible_ESV(request):
         else:
             fina_scripture = zip(scripture, data[0])
 
-    if language_1 == '영어':
+    if language_1 == '영어'or 'bible_esv' in request.get_full_path():
         return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
                                               'language_2': language_2,
                                               'daily_verse': daily_verse, 'today': date,
@@ -254,7 +254,7 @@ def bible_chinese(request):
         else:
             fina_scripture = zip(scripture, data[0])
 
-    if language_1 == '중국어':
+    if language_1 == '중국어' or 'bible_chinese' in request.get_full_path():
         return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
                                               'language_2': language_2,
                                               'daily_verse': daily_verse, 'today': date,
@@ -378,7 +378,7 @@ def bible_korean(request):
         else:
             fina_scripture = scripture
 
-    if language_1 == '한국어':
+    if language_1 == '한국어' or 'bible_korean' in request.get_full_path():
         return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
                                               'language_2': language_2,
                                               'daily_verse': daily_verse, 'today': date,
@@ -477,7 +477,7 @@ def bible_greek(request):
             else:
                 fina_scripture = zip(scripture, data[0])
 
-        if language_1 == '그리스어(신약)':
+        if language_1 == '그리스어(신약)' or 'bible_greek' in request.get_full_path():
             return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
                                                   'language_2': language_2,
                                                   'daily_verse': daily_verse, 'today': date,
@@ -600,7 +600,7 @@ def bible_hebrew(request):
             else:
                 fina_scripture = zip(scripture, data[0])
 
-        if language_1 == '히브리어(국약)':
+        if language_1 == '히브리어(국약)' or 'bible_hebrew' in request.get_full_path():
             return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
                                                   'language_2': language_2,
                                                   'daily_verse': daily_verse, 'today': date,
