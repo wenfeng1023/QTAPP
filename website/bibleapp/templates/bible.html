@@ -164,13 +164,13 @@
         if ('{{bible_qt}}' == "생명의삶"){
            
         
-        e.clipboardData.setData('text/plain', $('<div/>').html(selection + "").text() + "\n\n" + 'Source: ' +
-            "https://neoqt.neowine.com"+"\n\n"+"CGNTV해설:"+"http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4");
+        e.clipboardData.setData('text/plain', 'Source: ' +
+            "https://neoqt.neowine.com"+"\n\n"+"CGNTV해설:"+"http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4"+$('<div/>').html(selection + "").text());
         //e.clipboardData.setData('text/html', selection + '<br /><br /><a href="' + document.location.href +
          //   '">Source</a>');
         }else{
-            e.clipboardData.setData('text/plain', $('<div/>').html(selection + "").text() + "\n\n" + 'Source: ' +
-            "https://neoqt.neowine.com"+"\n\n"+"오디오해설:"+"https://meditation.su.or.kr/meditation_mp3/2023/20{{f_date}}.mp3");
+            e.clipboardData.setData('text/plain',  "\n\n" + 'Source: ' +
+            "https://neoqt.neowine.com"+"\n\n"+"오디오해설:"+"https://meditation.su.or.kr/meditation_mp3/2023/20{{f_date}}.mp3"+$('<div/>').html(selection + "").text());
         }
         // Remove space of text after copy
         e.clipboardData.setData('text/plain', e.clipboardData.getData('Text').replace(/\s\s+/g,'\n'));
