@@ -70,6 +70,7 @@
     <!--<button id="button1" onclick="CopyToClipboard('editor1')">COPY</button> -->
     <div id='editor1' class="form-floating mb-3">
         <h5 class="fw-bold mb-0">{{today}} {{book_name}} {{daily_verse}}
+            <input id = 'ur1'type = 'hidden' value= "https://neoqt.neowine.com">
             {%if bible_qt == '생명의삶'%}
             <a href="http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4" target="_blank">
                 <img src="{% static 'img/icons8-link-16.png'%}">
@@ -120,11 +121,11 @@
         {%if text2.Book_No < '40'%}
         <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
         <p class='ezra'><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
-        <br>
+        
         {%else%}
         <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
         <p><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
-        <br>
+    
         {%endif%}
         {% endfor %}
 
@@ -158,37 +159,64 @@
     }
     // add url when someone copied text
 
-    {% comment %} document.addEventListener('copy', function (e) {
-        var selection = window.getSelection();
+    document.addEventListener('copy', function (e) {
+        var selection = window.getSelection()
+        if ('{{bible_qt}}' == "생명의삶"){
+           
+        
         e.clipboardData.setData('text/plain', $('<div/>').html(selection + "").text() + "\n\n" + 'Source: ' +
-            document.location.href);
-        e.clipboardData.setData('text/html', selection + '<br /><br /><a href="' + document.location.href +
-            '">Source</a>');
+            "https://neoqt.neowine.com"+"\n\n"+"CGNTV해설:"+"http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4");
+        //e.clipboardData.setData('text/html', selection + '<br /><br /><a href="' + document.location.href +
+         //   '">Source</a>');
+        }else{
+            e.clipboardData.setData('text/plain', $('<div/>').html(selection + "").text() + "\n\n" + 'Source: ' +
+            "https://neoqt.neowine.com"+"\n\n"+"오디오해설:"+"https://meditation.su.or.kr/meditation_mp3/2023/20{{f_date}}.mp3");
+        }
+        // Remove space of text after copy
+        e.clipboardData.setData('text/plain', e.clipboardData.getData('Text').replace(/\s\s+/g,'\n'));
+        //console.log(e.clipboardData.getData('Text').replace(/\s\s+/g,'\n'));
         e.preventDefault();
-    }); {% endcomment %}
+    }); 
 
      function CopyToClipboard(id) {
+        //var dummy = document.createElement('p');
+       // dummy.textContent = window.location.href;
+        //document.body.appendChild(dummy);
+
         var r = document.createRange();
-        r.selectNode(document.getElementById(id));
-    
+        //r.setStartBefore(dummy);
+        //r.setEndAfter(document.getElementById(id));
+        r.selectNodeContents(document.getElementById(id));
+        //r.insertNode(dummy);
         window.getSelection().removeAllRanges();
-        window.getSelection().addRange(r);
+        window.getSelection().addRange(r)
         try {
-            document.execCommand('copy');
+           
+            document.execCommand('copy')
+            //document.body.removeChild(dummy);
             window.getSelection().removeAllRanges();
+
+            
         
             //console.log('Successfully copy text: hello world '+r);
         } catch (err) {
             console.log('Unable to copy!');
         }
+
+        
     }  
+
+</script>
+<script>
+
 </script>
 <!--share-->
+<!--
 <script>
     function CopyToClipboard(id) {
         var r = document.createRange();
         r.selectNode(document.getElementById(id));
-    
+        r.toString()+"https://neoqt.neowine.com"
         window.getSelection().removeAllRanges();
         window.getSelection().addRange(r);
         try {
@@ -198,16 +226,16 @@
             const shareData = {
                 title: 'MDN',
                 text: r,
-                url: 'https://developer.mozilla.org'
+                url: 'https://neoqt.neowine.com'
               }
               
               const btn = document.getElementById('copy-button');
               const resultPara = document.querySelector('.result');
               try {
                 navigator.share(shareData);
-                resultPara.textContent = 'MDN shared successfully';
+                //resultPara.textContent = 'MDN shared successfully';
               } catch (err) {
-                resultPara.textContent = `Error: ${err}`;
+                //resultPara.textContent = `Error: ${err}`;
               }
               // Share must be triggered by "user activation"
              // btn.addEventListener('click', async () => {
@@ -223,7 +251,7 @@
    
     
 </script>
-
+-->
 <script>
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').hover(function () {

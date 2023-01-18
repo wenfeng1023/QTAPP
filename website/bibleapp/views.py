@@ -66,7 +66,7 @@ def setting(request):
             return redirect('bible_korean')
         elif select_1 == '그리스어(신약)':
             return redirect('bible_greek')
-        elif select_1 == '히브리어(국약)':
+        elif select_1 == '히브리어(구약)':
             return redirect('bible_hebrew')
         else:
             return redirect('bible_chinese')
@@ -587,7 +587,7 @@ def bible_hebrew(request):
                 Chapter=chapter,
                 Verse_as_int__range=(start_v, end_v)
             )
-        if language_2 == None or '히브리어(국약)'in language_2:
+        if language_2 == None or '히브리어(구약)'in language_2:
             fina_scripture = scripture
         else:
             language_2 = language_2.split(',')
@@ -600,7 +600,7 @@ def bible_hebrew(request):
             else:
                 fina_scripture = zip(scripture, data[0])
 
-        if language_1 == '히브리어(국약)' or 'bible_hebrew' in request.get_full_path():
+        if language_1 == '히브리어(구약)' or 'bible_hebrew' in request.get_full_path():
             return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
                                                   'language_2': language_2,
                                                   'daily_verse': daily_verse, 'today': date,
@@ -609,7 +609,7 @@ def bible_hebrew(request):
         else:
             return scripture
     else:
-        if language_1 !='히브리어(국약)':
+        if language_1 !='히브리어(구약)':
             scripture = '오늘 구약 말씀이 아니다,히브리어없다!'
             return scripture
         else:
@@ -636,7 +636,7 @@ def login(request):
                 return redirect('bible_korean')
             elif language == '그리스어(신약)':
                 return redirect('bible_greek')
-            elif language == '히브리어(국약)':
+            elif language == '히브리어(구약)':
                 return redirect('bible_hebrew')
             else:
                 return redirect('bible_chinese')
@@ -1043,7 +1043,7 @@ def second_lang(request, lang):
         elif l == '중국어':
             data_2 = bible_chinese(request)
             data.append(data_2)
-        elif l == '히브리어(국약)':
+        elif l == '히브리어(구약)':
             data_3 = bible_hebrew(request)
             data.append(data_3)
         else:
