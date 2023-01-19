@@ -70,7 +70,7 @@
     <!--<button id="button1" onclick="CopyToClipboard('editor1')">COPY</button> -->
     <div id='editor1' class="form-floating mb-3">
         <h5 class="fw-bold mb-0">{{today}} {{book_name}} {{daily_verse}}
-            <input id = 'ur1'type = 'hidden' value= "https://neoqt.neowine.com">
+            <input id='ur1' type='hidden' value="https://neoqt.neowine.com">
             {%if bible_qt == '생명의삶'%}
             <a href="http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4" target="_blank">
                 <img src="{% static 'img/icons8-link-16.png'%}">
@@ -121,11 +121,11 @@
         {%if text2.Book_No < '40'%}
         <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
         <p class='ezra'><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
-        
+
         {%else%}
         <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
         <p><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
-    
+
         {%endif%}
         {% endfor %}
 
@@ -157,30 +157,38 @@
             v => alert("Success"),
             e => alert("Fail\n" + e));
     }
-    // add url when someone copied text
+    // add url when someone copied textremoves some content from selection, in JavaScript?
 
     document.addEventListener('copy', function (e) {
         var selection = window.getSelection()
-        if ('{{bible_qt}}' == "생명의삶"){
-           
-        
-        e.clipboardData.setData('text/plain', 'Source: ' +
-            "https://neoqt.neowine.com"+"\n\n"+"CGNTV해설:"+"http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4"+"\n"+$('<div/>').html(selection + "").text());
-        //e.clipboardData.setData('text/html', selection + '<br /><br /><a href="' + document.location.href +
-         //   '">Source</a>');
-        }else{
-            e.clipboardData.setData('text/plain',  "\n\n" + 'Source: ' +
-            "https://neoqt.neowine.com"+"\n\n"+"오디오해설:"+"https://meditation.su.or.kr/meditation_mp3/2023/20{{f_date}}.mp3"+"\n"+$('<div/>').html(selection + "").text());
-        }
-        // Remove space of text after copy
-        e.clipboardData.setData('text/plain', e.clipboardData.getData('Text').replace(/\s\s+/g,'\n'));
-        //console.log(e.clipboardData.getData('Text').replace(/\s\s+/g,'\n'));
-        e.preventDefault();
-    }); 
+        //To delete first line and make a sigle space for text. the function of replace(/\s\s+/g, '\n') make a sigle space.
+        var new_text = selection.getRangeAt(0).toString().replace(/\s\s+/g, '\n').replace(
+            '{{today}} {{book_name}} {{daily_verse}}', '');
+        console.log(new_text);
 
-     function CopyToClipboard(id) {
+        e.clipboardData.setData('text/plain', e.clipboardData.getData('Text').replace(/\s\s+/g, '\n', 1));
+        if ('{{bible_qt}}' == "생명의삶") {
+
+
+            e.clipboardData.setData('text/plain', 'Source: ' +
+                "https://neoqt.neowine.com" + "\n\n" + "CGNTV해설:" +
+                "http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4" + "\n\n" +
+                "{{today}} {{book_name}} {{daily_verse}}" + "\n\n" + new_text);
+            //e.clipboardData.setData('text/html', selection + '<br /><br /><a href="' + document.location.href +
+            //   '">Source</a>');
+        } else {
+            e.clipboardData.setData('text/plain', "\n" + 'Source: ' + "\n" +
+                "https://neoqt.neowine.com" + "\n\n" + '오디오해설:' + "\n" +
+                "https://meditation.su.or.kr/meditation_mp3/2023/20{{f_date}}.mp3" + "\n\n" +
+                "{{today}} {{book_name}} {{daily_verse}}" + new_text);
+        }
+
+        e.preventDefault();
+    });
+
+    function CopyToClipboard(id) {
         //var dummy = document.createElement('p');
-       // dummy.textContent = window.location.href;
+        // dummy.textContent = window.location.href;
         //document.body.appendChild(dummy);
 
         var r = document.createRange();
@@ -191,21 +199,20 @@
         window.getSelection().removeAllRanges();
         window.getSelection().addRange(r)
         try {
-           
+
             document.execCommand('copy')
             //document.body.removeChild(dummy);
             window.getSelection().removeAllRanges();
 
-            
-        
+
+
             //console.log('Successfully copy text: hello world '+r);
         } catch (err) {
             console.log('Unable to copy!');
         }
 
-        
-    }  
 
+    }
 </script>
 <script>
 
