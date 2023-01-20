@@ -67,6 +67,9 @@
     <p class="result"></p>
 </div>
 <div class="modal-body p-5 pt-0">
+    <a href="javascript:SetFont(27)" style ="color: black;text-decoration: none;|font-size: xx-large;"><i class="bi bi-fonts"style="font-size: 27px;"></i></a> 
+<a href="javascript:SetFont(18)"style ="color: black;text-decoration: none;|font-size: xx-large;"><i class="bi bi-fonts"style="font-size: 18px;"></i></a> 
+<a href="javascript:SetFont(14)"style ="color: black;text-decoration: none;|font-size: xx-large;"><i class="bi bi-fonts"style="font-size: 14px;"></i></a>
     <!--<button id="button1" onclick="CopyToClipboard('editor1')">COPY</button> -->
     <div id='editor1' class="form-floating mb-3">
         <h5 class="fw-bold mb-0">{{today}} {{book_name}} {{daily_verse}}
@@ -302,5 +305,21 @@
             $('#datePicker').datepicker('setDate', date);
         })
     });
+</script>
+<!--set font size-->
+<script type="text/javascript">
+    function SetFont(size) {
+        var divBody = document.getElementById("editor1");
+        if (!divBody) {
+            return;
+        }
+        divBody.style.fontSize = size + "px";
+        var divChildBody = divBody.childNodes;
+        for (var i = 0; i < divChildBody.length; i++) {
+            if (divChildBody[i].nodeType == 1) {
+                divChildBody[i].style.fontSize = size + "px";
+            }
+        }
+    }
 </script>
 {%endblock%}
