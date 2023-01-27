@@ -148,7 +148,7 @@ def Bible_ESV(request):
     else:
         language_2 = language_2.split(',')
         length = len(language_2)+1
-        data = data = second_lang(request, language_2)
+        data = data = second_lang(request, language_2,book_no)
         if len(language_2) == 3:
             fina_scripture = zip(scripture, data[0], data[1], data[2])
         elif len(language_2) == 2:
@@ -244,7 +244,7 @@ def bible_chinese(request):
     else:
         language_2 = language_2.split(',')
         length = len(language_2)+1
-        data = data = second_lang(request, language_2)
+        data = data = second_lang(request, language_2,book_no)
         if len(language_2) == 3:
             fina_scripture = zip(scripture, data[0], data[1], data[2])
         elif len(language_2) == 2:
@@ -365,7 +365,7 @@ def bible_korean(request):
     else:
         language_2 = language_2.split(',')
         length = len(language_2)+1
-        data = second_lang(request, language_2)
+        data = second_lang(request, language_2,book_no)
         if data:
             if len(language_2) == 3:
                 fina_scripture = zip(scripture, data[0], data[1], data[2])
@@ -389,13 +389,161 @@ Biblical original languages(Hebrew and Greek)
 '''
 @login_required(login_url='login')
 def orig_language(request):
-    date = dt.datetime.today().strftime("%Y-%m-%d")
-    daily_bible = bible_plan(request, date)
-    book_no = daily_bible.Book_No
-    if  int(book_no) >= 40:
-        return redirect('bible_greek')
+    try:
+
+        bible_qt = CustomSetting.objects.get(user=request.user).bible_plan
+        language_1 = CustomSetting.objects.get(user=request.user).lang_1
+        language_2 = CustomSetting.objects.get(user=request.user).lang_2
+        length = 1
+    except:
+        return redirect("setting")
+
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        f_date = date.replace('-', '')[2:]
+        daily_bible = bible_plan(request, date)
+        book_no = daily_bible.Book_No
+        cont = (daily_bible.Text).count(":")
+        daily_verse = daily_bible.Text
+        book_name = korean_title.objects.get(Book_ID=book_no).Book
     else:
-        return redirect('bible_hebrew')
+        date = dt.datetime.today().strftime("%Y-%m-%d")
+        f_date = date.replace('-', '')[2:]
+        daily_bible = bible_plan(request, date)
+        book_no = daily_bible.Book_No
+        cont = (daily_bible.Text).count(":")
+        daily_verse = daily_bible.Text
+        book_name = korean_title.objects.get(Book_ID=book_no).Book
+
+    if int(book_no) >= 40:
+        book_name = Greek_Bible.objects.filter(Book_No=book_no).first().Book
+        if cont > 1:
+            text = (daily_bible.Text).split("-")
+            start_ch = int(text[0].split(":")[0])
+            end_ch = int(text[1].split(":")[0])
+            start_v = int(text[0].split(":")[1])
+            end_v = int(text[1].split(":")[1])
+            strat_id = (
+                Greek_Bible.objects.annotate(
+                    Verse_as_int=Cast("Verse", IntegerField()),
+                    Chapter_as_int=Cast("Chapter", IntegerField()),
+                )
+                .get(Book_No=book_no, Chapter_as_int=start_ch, Verse_as_int=start_v)
+                .id
+            )
+            end_id = (
+                Greek_Bible.objects.annotate(
+                    Verse_as_int=Cast("Verse", IntegerField()),
+                    Chapter_as_int=Cast("Chapter", IntegerField()),
+                )
+                .get(Book_No=book_no, Chapter_as_int=end_ch, Verse_as_int=end_v).id
+            )
+
+            scripture = Greek_Bible.objects.annotate(
+                Chapter_as_int=Cast("Chapter", IntegerField())
+            ).filter(
+                Book_No=book_no,
+                Chapter_as_int__range=(start_ch, end_ch),
+                id__range=(strat_id, end_id),
+            )
+        else:
+            text = (daily_bible.Text).split(":")
+            chapter = int(text[0])
+            start_v = text[1].split("-")[0]
+            end_v = text[1].split("-")[1]
+            scripture = Greek_Bible.objects.annotate(
+                Verse_as_int=Cast('Verse', IntegerField())
+            ).filter(
+                Book_No=book_no,
+                Chapter=chapter,
+                Verse_as_int__range=(start_v, end_v)
+            )
+
+        if language_2 == None or '원어' in language_2:
+            fina_scripture = scripture
+        else:
+            language_2 = language_2.split(',')
+            length = len(language_2)+1
+            data = data = second_lang(request, language_2,book_no)
+            if len(language_2) == 3:
+                fina_scripture = zip(scripture, data[0], data[1], data[2])
+            elif len(language_2) == 2:
+                fina_scripture = zip(scripture, data[0], data[1])
+            else:
+                fina_scripture = zip(scripture, data[0])
+
+        if language_1 == '원어' or 'bible_greek' in request.get_full_path():
+            return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
+                                                  'language_2': language_2,
+                                                  'daily_verse': daily_verse, 'today': date,
+                                                  'book_name': book_name, 'f_date': f_date,
+                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
+        else:
+            return scripture
+    else:
+        book_name = Hebrew_Bible.objects.filter(Book_No=book_no).first().Book
+        if cont > 1:
+            text = (daily_bible.Text).split("-")
+            start_ch = int(text[0].split(":")[0])
+            end_ch = int(text[1].split(":")[0])
+            start_v = int(text[0].split(":")[1])
+            end_v = int(text[1].split(":")[1])
+            strat_id = (
+                Hebrew_Bible.objects.annotate(
+                    Verse_as_int=Cast("Verse", IntegerField()),
+                    Chapter_as_int=Cast("Chapter", IntegerField()),
+                )
+                .get(Book_No=book_no, Chapter_as_int=start_ch, Verse_as_int=start_v)
+                .id
+            )
+            end_id = (
+                Hebrew_Bible.objects.annotate(
+                    Verse_as_int=Cast("Verse", IntegerField()),
+                    Chapter_as_int=Cast("Chapter", IntegerField()),
+                )
+                .get(Book_No=book_no, Chapter_as_int=end_ch, Verse_as_int=end_v).id
+            )
+
+            scripture = Hebrew_Bible.objects.annotate(
+                Chapter_as_int=Cast("Chapter", IntegerField())
+            ).filter(
+                Book_No=book_no,
+                Chapter_as_int__range=(start_ch, end_ch),
+                id__range=(strat_id, end_id),
+            )
+        else:
+            text = (daily_bible.Text).split(":")
+            chapter = int(text[0])
+            start_v = text[1].split("-")[0]
+            end_v = text[1].split("-")[1]
+            scripture = Hebrew_Bible.objects.annotate(
+                Verse_as_int=Cast('Verse', IntegerField())
+            ).filter(
+                Book_No=book_no,
+                Chapter=chapter,
+                Verse_as_int__range=(start_v, end_v)
+            )
+        if language_2 == None or '원어'in language_2:
+            fina_scripture = scripture
+        else:
+            language_2 = language_2.split(',')
+            length = len(language_2)+1
+            data = data = second_lang(request, language_2,book_no)
+            if len(language_2) == 3:
+                fina_scripture = zip(scripture, data[0], data[1], data[2])
+            elif len(language_2) == 2:
+                fina_scripture = zip(scripture, data[0], data[1])
+            else:
+                fina_scripture = zip(scripture, data[0])
+
+        if language_1 == '원어' or 'bible_hebrew' in request.get_full_path():
+            return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
+                                                  'language_2': language_2,
+                                                  'daily_verse': daily_verse, 'today': date,
+                                                  'book_name': book_name, 'f_date': f_date,
+                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
+        else:
+            return scripture
 
 '''
 GreeK Bible(NT).
@@ -478,7 +626,7 @@ def bible_greek(request):
         else:
             language_2 = language_2.split(',')
             length = len(language_2)+1
-            data = data = second_lang(request, language_2)
+            data = data = second_lang(request, language_2,book_no)
             if len(language_2) == 3:
                 fina_scripture = zip(scripture, data[0], data[1], data[2])
             elif len(language_2) == 2:
@@ -500,12 +648,69 @@ def bible_greek(request):
             return scripture
         
         else:
-            scripture = '오늘 신약 말씀이 아니다,그리스어없다!'
+              book_name = Hebrew_Bible.objects.filter(Book_No=book_no).first().Book
+        if cont > 1:
+            text = (daily_bible.Text).split("-")
+            start_ch = int(text[0].split(":")[0])
+            end_ch = int(text[1].split(":")[0])
+            start_v = int(text[0].split(":")[1])
+            end_v = int(text[1].split(":")[1])
+            strat_id = (
+                Hebrew_Bible.objects.annotate(
+                    Verse_as_int=Cast("Verse", IntegerField()),
+                    Chapter_as_int=Cast("Chapter", IntegerField()),
+                )
+                .get(Book_No=book_no, Chapter_as_int=start_ch, Verse_as_int=start_v)
+                .id
+            )
+            end_id = (
+                Hebrew_Bible.objects.annotate(
+                    Verse_as_int=Cast("Verse", IntegerField()),
+                    Chapter_as_int=Cast("Chapter", IntegerField()),
+                )
+                .get(Book_No=book_no, Chapter_as_int=end_ch, Verse_as_int=end_v).id
+            )
+
+            scripture = Hebrew_Bible.objects.annotate(
+                Chapter_as_int=Cast("Chapter", IntegerField())
+            ).filter(
+                Book_No=book_no,
+                Chapter_as_int__range=(start_ch, end_ch),
+                id__range=(strat_id, end_id),
+            )
+        else:
+            text = (daily_bible.Text).split(":")
+            chapter = int(text[0])
+            start_v = text[1].split("-")[0]
+            end_v = text[1].split("-")[1]
+            scripture = Hebrew_Bible.objects.annotate(
+                Verse_as_int=Cast('Verse', IntegerField())
+            ).filter(
+                Book_No=book_no,
+                Chapter=chapter,
+                Verse_as_int__range=(start_v, end_v)
+            )
+        if language_2 == None or '원어'in language_2:
+            fina_scripture = scripture
+        else:
+            language_2 = language_2.split(',')
+            length = len(language_2)+1
+            data = data = second_lang(request, language_2,book_no)
+            if len(language_2) == 3:
+                fina_scripture = zip(scripture, data[0], data[1], data[2])
+            elif len(language_2) == 2:
+                fina_scripture = zip(scripture, data[0], data[1])
+            else:
+                fina_scripture = zip(scripture, data[0])
+
+        if language_1 == '원어' or 'bible_hebrew' in request.get_full_path():
             return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
-                                                    'language_2': language_2,
-                                                    'daily_verse': daily_verse, 'today': date,
-                                                    'book_name': book_name, 'f_date': f_date,
-                                                    'bible_qt': bible_qt,})
+                                                  'language_2': language_2,
+                                                  'daily_verse': daily_verse, 'today': date,
+                                                  'book_name': book_name, 'f_date': f_date,
+                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
+        else:
+            return scripture
 
 
 '''
@@ -590,7 +795,7 @@ def bible_hebrew(request):
         else:
             language_2 = language_2.split(',')
             length = len(language_2)+1
-            data = data = second_lang(request, language_2)
+            data = data = second_lang(request, language_2,book_no)
             if len(language_2) == 3:
                 fina_scripture = zip(scripture, data[0], data[1], data[2])
             elif len(language_2) == 2:
@@ -611,13 +816,14 @@ def bible_hebrew(request):
             scripture = '오늘 구약 말씀이 아니다,히브리어없다!'
             return scripture
         else:
-            messages.info(request, '오늘 구약 말씀이 아니다,히브리어없다!')
-            scripture = '오늘 구약 말씀이 아니다,히브리어없다!'
-            return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
-                                                    'language_2': language_2,
-                                                    'daily_verse': daily_verse, 'today': date,
-                                                    'book_name': book_name, 'f_date': f_date,
-                                                    'bible_qt': bible_qt,})
+            return redirect('bible_greek')
+            # messages.info(request, '오늘 구약 말씀이 아니다,히브리어없다!')
+            # scripture = '오늘 구약 말씀이 아니다,히브리어없다!'
+            # return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
+            #                                         'language_2': language_2,
+            #                                         'daily_verse': daily_verse, 'today': date,
+            #                                         'book_name': book_name, 'f_date': f_date,
+            #                                         'bible_qt': bible_qt,})
 
         # return render(request, 'bible_original.html', {'today': date, })
 
@@ -634,8 +840,10 @@ def login(request):
                 return redirect('bible_korean')
             elif language == '원어':
                 return redirect('orig_language')
-            else:
+            elif language=='중국어':
                 return redirect('bible_chinese')
+            else:
+                return redirect('setting')
         else:
             return redirect('setting')
     else:
@@ -1029,11 +1237,11 @@ def remove(request):
 '''Deal with the second language'''
 
 
-def second_lang(request, lang):
+def second_lang(request, lang,book_no):
     data = []
-    date = dt.datetime.today().strftime("%Y-%m-%d")
-    daily_bible = bible_plan(request, date)
-    book_no = daily_bible.Book_No
+    # date = dt.datetime.today().strftime("%Y-%m-%d")
+    # daily_bible = bible_plan(request, date)
+    # book_no = daily_bible.Book_No
     for l in lang:
 
         if l == '영어':
@@ -1042,11 +1250,11 @@ def second_lang(request, lang):
         elif l == '중국어':
             data_2 = bible_chinese(request)
             data.append(data_2)
-        elif l == '원어' and int(book_no)<=40:            
-            data_3 = bible_hebrew(request)
+        elif l == '원어':            
+            data_3 = orig_language(request)
             data.append(data_3)
         else:
-            data_4 = bible_greek(request)
+            data_4 = "orig_language(request)"
             data.append(data_4)
     return data
 
