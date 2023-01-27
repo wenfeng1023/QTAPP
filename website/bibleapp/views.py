@@ -64,10 +64,8 @@ def setting(request):
             return redirect('bible_esv')
         elif select_1 == '한국어':
             return redirect('bible_korean')
-        elif select_1 == '그리스어(신약)':
-            return redirect('bible_greek')
-        elif select_1 == '히브리어(구약)':
-            return redirect('bible_hebrew')
+        elif select_1 == '원어':
+            return redirect('orig_language')
         else:
             return redirect('bible_chinese')
 
@@ -163,7 +161,7 @@ def Bible_ESV(request):
                                               'language_2': language_2,
                                               'daily_verse': daily_verse, 'today': date,
                                               'book_name': book_name, 'f_date': f_date,
-                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length})
+                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
     else:
         return scripture
 
@@ -259,7 +257,7 @@ def bible_chinese(request):
                                               'language_2': language_2,
                                               'daily_verse': daily_verse, 'today': date,
                                               'book_name': book_name, 'f_date': f_date,
-                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length})
+                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
     else:
         return scripture
     # return render(request, 'bible.html', {'scripture': scripture,
@@ -383,10 +381,21 @@ def bible_korean(request):
                                               'language_2': language_2,
                                               'daily_verse': daily_verse, 'today': date,
                                               'book_name': book_name, 'f_date': f_date,
-                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length})
+                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
     else:
         return scripture
-
+'''
+Biblical original languages(Hebrew and Greek)
+'''
+@login_required(login_url='login')
+def orig_language(request):
+    date = dt.datetime.today().strftime("%Y-%m-%d")
+    daily_bible = bible_plan(request, date)
+    book_no = daily_bible.Book_No
+    if  int(book_no) >= 40:
+        return redirect('bible_greek')
+    else:
+        return redirect('bible_hebrew')
 
 '''
 GreeK Bible(NT).
@@ -464,7 +473,7 @@ def bible_greek(request):
                 Verse_as_int__range=(start_v, end_v)
             )
 
-        if language_2 == None or '그리스어(신약)' in language_2:
+        if language_2 == None or '원어' in language_2:
             fina_scripture = scripture
         else:
             language_2 = language_2.split(',')
@@ -477,16 +486,16 @@ def bible_greek(request):
             else:
                 fina_scripture = zip(scripture, data[0])
 
-        if language_1 == '그리스어(신약)' or 'bible_greek' in request.get_full_path():
+        if language_1 == '원어' or 'bible_greek' in request.get_full_path():
             return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
                                                   'language_2': language_2,
                                                   'daily_verse': daily_verse, 'today': date,
                                                   'book_name': book_name, 'f_date': f_date,
-                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length})
+                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
         else:
             return scripture
     else:
-        if language_1 != '그리스어(신약)':
+        if language_1 != '원어':
             scripture = '오늘 신약 말씀이 아니다,그리스어없다!'
             return scripture
         
@@ -497,17 +506,6 @@ def bible_greek(request):
                                                     'daily_verse': daily_verse, 'today': date,
                                                     'book_name': book_name, 'f_date': f_date,
                                                     'bible_qt': bible_qt,})
-       
-
-    # else:
-    #     messages.info(request, "오늘 신약 말씀이 아니다,그리스어없다!!")
-    #     scripture = "오늘 신약 말씀이 아니다,그리스어없다!!"
-    #     return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
-    #                                               'language_2': language_2,
-    #                                               'daily_verse': daily_verse, 'today': date,
-    #                                               'book_name': book_name, 'f_date': f_date,})
-
-        # return render(request, 'bible_original.html', {'today': date, })
 
 
 '''
@@ -587,7 +585,7 @@ def bible_hebrew(request):
                 Chapter=chapter,
                 Verse_as_int__range=(start_v, end_v)
             )
-        if language_2 == None or '히브리어(구약)'in language_2:
+        if language_2 == None or '원어'in language_2:
             fina_scripture = scripture
         else:
             language_2 = language_2.split(',')
@@ -600,16 +598,16 @@ def bible_hebrew(request):
             else:
                 fina_scripture = zip(scripture, data[0])
 
-        if language_1 == '히브리어(구약)' or 'bible_hebrew' in request.get_full_path():
+        if language_1 == '원어' or 'bible_hebrew' in request.get_full_path():
             return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
                                                   'language_2': language_2,
                                                   'daily_verse': daily_verse, 'today': date,
                                                   'book_name': book_name, 'f_date': f_date,
-                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length})
+                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
         else:
             return scripture
     else:
-        if language_1 !='히브리어(구약)':
+        if language_1 !='원어':
             scripture = '오늘 구약 말씀이 아니다,히브리어없다!'
             return scripture
         else:
@@ -634,10 +632,8 @@ def login(request):
                 return redirect('bible_esv')
             elif language == '한국어':
                 return redirect('bible_korean')
-            elif language == '그리스어(신약)':
-                return redirect('bible_greek')
-            elif language == '히브리어(구약)':
-                return redirect('bible_hebrew')
+            elif language == '원어':
+                return redirect('orig_language')
             else:
                 return redirect('bible_chinese')
         else:
@@ -1035,6 +1031,9 @@ def remove(request):
 
 def second_lang(request, lang):
     data = []
+    date = dt.datetime.today().strftime("%Y-%m-%d")
+    daily_bible = bible_plan(request, date)
+    book_no = daily_bible.Book_No
     for l in lang:
 
         if l == '영어':
@@ -1043,7 +1042,7 @@ def second_lang(request, lang):
         elif l == '중국어':
             data_2 = bible_chinese(request)
             data.append(data_2)
-        elif l == '히브리어(구약)':
+        elif l == '원어' and int(book_no)<40:            
             data_3 = bible_hebrew(request)
             data.append(data_3)
         else:

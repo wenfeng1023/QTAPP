@@ -8,6 +8,7 @@ urlpatterns = [
     path('bible_korean', views.bible_korean, name = 'bible_korean'),
     path('bible_greek', views.bible_greek, name = 'bible_greek'),
     path('bible_hebrew', views.bible_hebrew, name = 'bible_hebrew'),
+    path('orig_language', views.orig_language, name = 'orig_language'),
     path('user_profile', views.user_profile, name = 'user_profile'),
     path('meditation', views.add_meditaion, name = 'meditation'),
     path('show_meditation', views.show_meditation, name = 'show_meditation'),

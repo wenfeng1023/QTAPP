@@ -23,6 +23,7 @@
 <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
 
 <style>
+
     .main-content {
         direction: rtl;
         /* Right to Left */
@@ -47,6 +48,7 @@
 <div class="modal-header p-5 pb-4 border-bottom-0">
     <!-- <h5 class="modal-title">Modal title</h5> -->
     <h2 class="fw-bold mb-0">오늘말씀</h2>
+    
     <form action="#" method='POST'>
         {% csrf_token %}
 
@@ -88,57 +90,57 @@
         <!--To know how many language selected-->
         {%if length == 4 %}
         {%for text1,text2,text3,text4 in fina_scripture%}
-        <!--Setting Hebrew fonts if include Hebrew Bible-->
-        {%if text4.Book_No < '40'%}
-        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
-        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
-        <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
-        <p class='ezra'><sup>{{text4.Verse}}</sup>{{text4.Text}}</p>
-        <br>
-        {%else%}
-        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
-        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
-        <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
-        <p><sup>{{text4.Verse}}</sup>{{text4.Text}}</p>
-        <br>
-        {%endif%}
+            <!--Setting Hebrew fonts if include Hebrew Bible-->
+            {%if book_no < 40%}
+            <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+            <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+            <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
+            <p class='ezra'>{{text4.Text}}</p>
+            <br>
+            {%else%}
+            <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+            <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+            <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
+            <p><sup>{{text4.Verse}}</sup>{{text4.Text}}</p>
+            <br>
+            {%endif%}
         {% endfor %}
 
         {%elif length == 3%}
         {%for text1,text2,text3 in fina_scripture%}
-        {%if text3.Book_No < '40'%}
-        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
-        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
-        <p class='ezra'><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
-        <br>
-        {%else%}
-        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
-        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
-        <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
-        <br>
-        {% endif %}
+            {%if  book_no < 40%}
+            <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+            <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+            <p class='ezra'>{{text3.Text}}</p>
+            <br>
+            {%else%}
+            <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+            <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+            <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
+            <br>
+            {% endif %}
         {% endfor %}
 
         {%elif length == 2%}
         {%for text1,text2 in fina_scripture%}
-        {%if text2.Book_No < '40'%}
-        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
-        <p class='ezra'><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
+            {%if book_no < 40%}
+            <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+            <p class='ezra'><strong>{{text2.Text}}</strong></p>
 
-        {%else%}
-        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
-        <p><sup>{{text2.Verse}}</sup><strong>{{text2.Text}}</strong></p>
+            {%else%}
+            <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+            <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
 
-        {%endif%}
+            {%endif%}
         {% endfor %}
 
         {%else%}
         {%for text in fina_scripture%}
-        {%if text.Book_No < '40'%}
-        <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
-        {%else%}
-        <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
-        {%endif%}
+            {%if book_no < 40%}
+            <p class='ezra'><strong>{{text.Text}}</strong></p>
+            {%else%}
+            <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
+            {%endif%}
         {%endfor%}
         {%endif%}
     </div>
@@ -321,5 +323,8 @@
             }
         }
     }
+</script>
+<script>
+    
 </script>
 {%endblock%}
