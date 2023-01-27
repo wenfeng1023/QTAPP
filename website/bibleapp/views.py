@@ -1042,7 +1042,7 @@ def second_lang(request, lang):
         elif l == '중국어':
             data_2 = bible_chinese(request)
             data.append(data_2)
-        elif l == '원어' and int(book_no)<40:            
+        elif l == '원어' and int(book_no)<=40:            
             data_3 = bible_hebrew(request)
             data.append(data_3)
         else:
