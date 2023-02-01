@@ -5,7 +5,6 @@
 <title>NEOQT365 </title>
 {% endblock %}
 {% block content %}
-
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
     integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous">
 </script>
@@ -44,6 +43,112 @@
     }
 
     @import url(http://fonts.googleapis.com/earlyaccess/alefhebrew.css);
+    
+
+    :root {
+        --primary-color: #302AE6;
+        --secondary-color: #536390;
+        --font-color: #424242;
+        --bg-color: #fff;
+        --heading-color: #292922;
+    }
+      
+    [data-theme="dark"] {
+        --primary-color: #9A97F3;
+        --secondary-color: #818cab;
+        --font-color: #e1e1ff;
+        --bg-color: #161625;
+        --heading-color: #818cab;
+    }
+
+    div {
+        background-color: var(--bg-color);
+        color: var(--font-color);
+    
+        /*other styles*/
+        .....
+    }
+    
+    h1 {
+        color: var(--secondary-color);
+    
+        /*other styles*/
+        .....
+    }
+    
+    a {
+        color: var(--primary-color);
+    
+        /*other styles*/
+        .....
+    }
+    i {
+        color: var(--secondary-color);
+    
+        /*other styles*/
+        .....
+    }
+
+    /*Simple css to style it like a toggle switch*/
+.theme-switch-wrapper {
+  display: flex;
+  align-items: center;
+
+  em {
+    margin-left: 10px;
+    font-size: 1rem;
+  }
+}
+.theme-switch {
+  display: inline-block;
+  height: 34px;
+  position: relative;
+  width: 60px;
+}
+
+.theme-switch input {
+  display:none;
+
+}
+
+.slider {
+  background-color: #ccc;
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: .4s;
+}
+
+.slider:before {
+  background-color: #fff;
+  bottom: 4px;
+  content: "";
+  height: 26px;
+  left: 4px;
+  position: absolute;
+  transition: .4s;
+  width: 26px;
+}
+
+input:checked + .slider {
+  background-color: #66bb6a;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
 </style>
 <div class="modal-header p-5 pb-4 border-bottom-0">
     <!-- <h5 class="modal-title">Modal title</h5> -->
@@ -68,12 +173,27 @@
     </button>
     <p class="result"></p>
 </div>
+
 <div class="modal-body p-5 pt-0">
+    
+   
+
+
+
+<div class="theme-switch-wrapper">
     <a href="javascript:SetFont(27)" style ="color: black;text-decoration: none;|font-size: xx-large;"><i class="bi bi-fonts"style="font-size: 27px;"></i></a> 
-<a href="javascript:SetFont(18)"style ="color: black;text-decoration: none;|font-size: xx-large;"><i class="bi bi-fonts"style="font-size: 18px;"></i></a> 
-<a href="javascript:SetFont(14)"style ="color: black;text-decoration: none;|font-size: xx-large;"><i class="bi bi-fonts"style="font-size: 14px;"></i></a>
-    <!--<button id="button1" onclick="CopyToClipboard('editor1')">COPY</button> -->
+    <a href="javascript:SetFont(18)"style ="color: black;text-decoration: none;|font-size: xx-large;"><i class="bi bi-fonts"style="font-size: 18px;"></i></a> 
+    <a href="javascript:SetFont(14)"style ="color: black;text-decoration: none;|font-size: xx-large;"><i class="bi bi-fonts"style="font-size: 14px;"></i></a>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <label class="theme-switch" for="checkbox">
+        <input type="checkbox" id="checkbox" />
+        <div class="slider round"></div>
+  </label>
+  <em>야간 모드</em>
+</div>
+          
     <div id='editor1' class="form-floating mb-3">
+        
         <h5 class="fw-bold mb-0">{{today}} {{book_name}} {{daily_verse}}
             <input id='ur1' type='hidden' value="https://neoqt.neowine.com">
             {%if bible_qt == '생명의삶'%}
@@ -144,6 +264,7 @@
         {%endfor%}
         {%endif%}
     </div>
+
     <button id="copy-button" type="submit" class="btn btn-outline-primary btn-sm"
         onclick="event.preventDefault();document.getElementById('magic-form').submit();">나의묵상글 등록하기</button>
     <a href="{%url 'prayer'%}">
@@ -219,7 +340,40 @@
 
     }
 </script>
+<!--change background color-->
 <script>
+    
+const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+
+function switchTheme(e) {
+    if (e.target.checked) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    else {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }    
+}
+
+toggleSwitch.addEventListener('change', switchTheme, false);
+function switchTheme(e) {
+    if (e.target.checked) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark'); //add this
+    }
+    else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light'); //add this
+    }    
+}
+const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+
+if (currentTheme) {
+    document.documentElement.setAttribute('data-theme', currentTheme);
+
+    if (currentTheme === 'dark') {
+        toggleSwitch.checked = true;
+    }
+}
 
 </script>
 <!--share-->
