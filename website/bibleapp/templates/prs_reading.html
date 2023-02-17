@@ -1,0 +1,370 @@
+{%load static%}
+<!DOCTYPE html>
+<html prefix="og: https://ogp.me/ns#" style=""
+    class=" js flexbox flexboxlegacy canvas canvastext webgl no-touch geolocation postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients no-cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers applicationcache svg inlinesvg smil svgclippaths">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <style class="vjs-styles-defaults">
+        .video-js {
+            width: 300px;
+            height: 150px;
+        }
+
+        .vjs-fluid:not(.vjs-audio-only-mode) {
+            padding-top: 56.25%
+        }
+        #prs_reset{
+            height: 24px;
+            width: 24px;
+            background-color: white;
+        }
+        #prs_home{
+            height: 25px;
+            width: 25px;
+            background-color: white;
+        }
+    </style>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Reading of Scripture</title>
+
+    <link href="{%static 'prs/icon.css'%}" rel="stylesheet">
+    <link href="{%static 'prs/css_002.css'%}" rel="stylesheet">
+
+    <link href="https://bible.prsi.org/ko/Content/Images/favicon_prs.ico" rel="shortcut icon" type="image/x-icon">
+
+    <link href="{%static 'prs/css.css'%}" rel="stylesheet">
+
+    <script type="text/javascript" async="" src="{%static 'prs/js'%}"></script>
+    <script src="{%static 'prs/modernizr'%}"></script>
+
+    <link rel="stylesheet" type="text/css" href="{%static 'prs/kstylesheet.css'%}">
+
+    <link rel="stylesheet" type="text/css" href="{%static 'prs/Spinner.css'%}">
+    <link rel="stylesheet" type="text/css" href="{%static 'prs/print.css'%}" media="print">
+    <link rel="stylesheet" href="{%static 'prs/materialize.min.css'%}">
+    <link rel="stylesheet" type="text/css" href="{%static 'prs/jquery-ui.min.css'%}">
+    <link href="{%static 'prs/video-js.css'%}" rel="stylesheet">
+    <link rel="stylesheet" href="{%static 'prs/fonts.css'%}">
+    <link rel="stylesheet" href="{%static 'prs/select2.min.css'%}">
+    <script src="{%static 'prs/js_002'%}" async=""></script>
+
+
+    <link href="{%static 'prs/jplayer.blue.monday.min.css'%}" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="{%static 'prs/jquery.min.js'%}"></script>
+    <script src="{%static 'prs/jquery.jplayer.min.js'%}"></script>
+    <script type="text/javascript" src="{%static 'prs/jplayer.playlist.min.js'%}"></script>
+    
+</head>
+
+<body class="ko_font_family" style="direction: ltr; height=1000px">
+
+    <div class="main_content_wrapper">
+
+        <div class="top_bar" style="background: #000000;">
+            <div class="top_bar_left_menu_options">
+                <div class="button_wrapper button_wrapper_margin_left" onclick="showPlaylists('성경 읽기 플랜', '회차');">
+
+                    <a href="{%url 'login'%}"><img id = 'prs_home' src = "{%static 'img/home.png'%}" alt="Example Image"><span class="icon_label">Home</span></a>
+
+                </div>
+                <div class="button_wrapper button_wrapper_margin_left" onclick="showPlaylists('성경 읽기 플랜', '회차');">
+
+                    <a href="{%url 'prs_reset'%}"> <img id='prs_reset' src="{%static 'img/reseti.png'%}" alt="Example Image">
+                    
+                        <span class="icon_label">Reset</span>
+                    </a>
+
+                </div>
+                <div id="playlist_fullscreen_button" class="button_wrapper button_wrapper_margin_left"
+                    onclick="goPlaylistFullscreen();" style=""><i class="presenter_button"><img
+                            src="{%static 'prs/presenter.png'%}"></i><span class="icon_label">말씀영상</span></div>
+            </div>
+            <div class="top_bar_main_content">
+                <div id="bible_name" class="bible_name">200회 성경읽기 - {{subtitle}}</div>
+
+
+                
+
+            </div>
+            
+            <div class="top_bar_right_menu_options">
+
+            </div>
+        </div>
+
+        <div class="main_content noselect">
+            <div id="bible_content_wrapper" class="bible_content_wrapper resizable">
+                <div id="bible_content" class="bible_content" style="font-size: 24px; direction: ltr;">
+
+
+                    <!--content-->
+
+                    {{html|safe}}
+
+
+
+                </div>
+            </div>
+            <div id="tree_content_wrapper" class="tree_content_wrapper">
+                <div id="splitter" class="splitter" style="touch-action: none;">
+                    <div class="splitter_thumb"></div>
+                </div>
+                <div class="tree_header">
+                    <a id="tree_back_link" class="tree_link" href="#"></a>
+                    <div id="tree_content_loading_spinner" class="spinner">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                    </div>
+                    <div id="tree_navBack" class="tree_navBack" onclick="treeGoBack();">↩</div>
+                    <div class="tree_close" onclick="hideTree();"></div>
+                </div>
+                <div id="tree_content_inner_wrapper" class="tree_content_inner_wrapper">
+                    <div id="tree_content" class="tree_content"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="purchase_alert" class="alert alert-info alert-dismissible fade show purchase_alert" role="alert">
+            <button type="button" class="btn-close" onclick="$('.purchase_alert').hide()"></button>
+            <div id="purchase_alert_title">This is some text</div>
+            <a id="purchase_alert_action" class="link">link</a>
+        </div>
+
+
+        <div class="bottom_bar" style="background: #000000">
+            <picture class="logo">
+                <source media="(min-width: 900px)" srcset="{%static 'prs/PRS_smlogo.png'%} 1x">
+                <img src="{%static 'prs/PRS_smlogo_mini.png'%}" width="50" height="50">
+            </picture>
+            <div id="media_controls" class="media_controls">
+                <div class="media_controls_wrapper">
+
+                    <audio id="myAudio" controls>
+                        <source src="{{open_mp3}}" type="audio/mpeg">
+                        {% for ot_mp3 in ot_mp3%}
+                        <source src="{{ot_mp3}}" type="audio/mpeg">
+                        {%endfor%}
+                        {%for nt_mp3 in nt_mp3%}
+                        <source src="{{nt_mp3}}" type="audio/mpeg">
+                        {%endfor%}
+
+                        <source src="{{end_mp3}}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+
+                    <!--
+                   <img id="media_control_step_back"
+                        class="media_control media_control_step_back media_control_with_hover"
+                        onclick="goPreviousPage();">
+                    <img id="media_control_rewind" class="media_control media_control_rewind media_control_with_hover"
+                        onclick="goPreviousVerse();">
+                    <img id="media_control_play_pause" class="media_control media_control_with_hover media_control_play"
+                        onclick="playPause();">
+                    <img id="media_control_fast_forward"
+                        class="media_control media_control_with_hover media_control_fast_forward"
+                        onclick="goNextVerse();">
+                    <img id="media_control_step_forward"
+                        class="media_control media_control_with_hover media_control_step_forward"
+                        onclick="goNextPage();">-->
+                </div>
+
+                <div id="media_time_control" class="media_time_control" style="display: none;"></div>
+            </div>
+            <div class="quick_menu fixed-action-btn direction-top">
+                <a id="quick_menu" class="btn-floating btn-sm grey">
+                    <i class="small material-icons">settings</i>
+                </a>
+                <ul>
+                    <li>
+                        <div>
+                            <a class="btn-floating red"><i class="material-icons">format_size</i></a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="quick_menu_row">
+                            <input id="font_size_slider" type="range" min="12" max="120" value="24"><span
+                                class="thumb"><span class="value"></span></span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div id="popup_overlay" class="popup_overlay" onclick="hideAllPopups();" style="opacity: 0; visibility: hidden;">
+    </div>
+
+    <div id="popup" class="popup" style="opacity: 0; visibility: hidden;">
+        <div class="popup_header" style="background: #000000">
+            <span id="popup_back" style="visibility: visible;">
+                <i class="popup_back small material-icons" onclick="goBackPopup();">arrow_back</i>
+            </span>
+            <span id="grid_list_options" class="book_display_option" style="visibility: hidden;">
+                <i class="popup_grid small material-icons" onclick="showFastpickerBookGrid();">grid_on</i>
+                <i class="popup_list small material-icons" onclick="showFastpickerBookList();">list</i>
+            </span>
+            <span id="popup_header_title" class="popup_header_title">200회 성경읽기</span>
+            <span id="popup_action" style="visibility: hidden;">
+                <i class="popup_action small material-icons">edit</i>
+            </span>
+            <span>
+                <i class="popup_close small material-icons" onclick="hideAllPopups();">close</i>
+            </span>
+        </div>
+        <div id="popup_content_wrapper" class="popup_content_wrapper">
+            <div id="popup_content_spinner" class="d-flex justify-content-center"
+                style="visibility: hidden; height: 0rem;">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only"></span>
+                </div>
+            </div>
+            <div id="popup_content" class="popup_content"></div>
+        </div>
+    </div>
+
+    <div id="loader" class="loading_overlay" style="visibility: hidden;">
+        <div id="loading_content_spinner" class="d-flex justify-content-center loading_spinner">
+        </div>
+    </div>
+
+    <div id="image_popup" class="image_popup">
+        <span class="image_close" onclick="hideImagePopup();"><i class="material-icons">close</i></span>
+        <div id="image_wrapper" class="image_wrapper"></div>
+    </div>
+
+    <div id="video_popup" class="video_popup">
+        <span class="video_close" onclick="hideVideoPopup();"><i class="material-icons">close</i></span>
+        <div id="video_wrapper" class="video_wrapper"></div>
+    </div>
+
+
+
+    <!-- Templates -->
+    <div id="bible_item_template" class="bible_item" style="display: none;">
+        <div class="bible_item_info_container" onclick="getBibleFromElement(this);">
+            <span id="bible_item_title" class="bible_item_title"></span><br>
+
+        </div>
+    </div>
+
+    <div id="search_template" style="display: none;">
+        <input type="search" id="searchInput" autofocus="" placeholder="Search ...">
+    </div>
+
+    <div id="bible_language_template" class="bible_item" style="display: none;">
+        <div class="bible_language_info_container" onclick="getBiblesFromLanguageElement(this);">
+            <span id="bible_language_title" class="bible_item_title"></span><br>
+
+        </div>
+    </div>
+
+    <div id="bible_country_template" class="bible_item" style="display: none;">
+        <div class="bible_country_info_container" onclick="getLanguageFromCountryElement(this);">
+            <span id="bible_country_title" class="bible_item_title"></span><br>
+
+        </div>
+    </div>
+
+    <div id="playlist_item_template" class="playlist_item" style="display: none;">
+        <div class="playlist_item_info_container">
+            <span id="playlist_item_title" class="playlist_item_title"></span><br>
+            <span id="playlist_item_section_count" class="playlist_item_section_count"></span>
+        </div>
+        <div class="playlist_item_buttons_container">
+            <div id="playlist_item_start" class="playlist_item_button playlist_item_button_start"
+                onclick="getPlaylistFromElement(this);">
+                <img>
+            </div>
+            <div id="playlist_item_sections" class="playlist_item_button playlist_item_button_sections"
+                onclick="showPlaylistSections(this);">
+                <img>
+            </div>
+            <div id="playlist_item_edit" class="playlist_item_button playlist_item_button_edit"
+                onclick="editPlaylistFromElement(this);">
+                <img>
+            </div>
+            <div id="playlist_item_share" class="playlist_item_button playlist_item_button_share"
+                onclick="sharePlaylistFromElement(this);">
+                <img>
+                <span>COPIED!</span>
+            </div>
+            <div id="playlist_item_delete" class="playlist_item_button playlist_item_button_delete"
+                onclick="deletePlaylistFromElement(this);">
+                <img>
+            </div>
+        </div>
+    </div>
+
+    <div id="playlist_section_item_template" class="playlist_section_item" style="display: none;"
+        onclick="getPlaylistFromElement(this);">
+        <div id="playlist_section_item_title" class="playlist_section_item_title"></div>
+        <div id="playlist_section_item_index" class="playlist_section_item_index"></div>
+    </div>
+
+    <div id="related_materials_item_template" class="side_menu_option" style="display: none"
+        onclick="showBookRelatedMaterial(this.id);">
+        <span id="related_materials_item_template_title"></span>
+    </div>
+
+    <div id="fast_picker_grid_template" class="fast_picker_grid" style="display: none;">
+        <span id="fast_picker_grid_header" class="fast_picker_grid_header"></span>
+    </div>
+
+    <div id="fast_picker_grid_item_template" class="fast_picker_grid_item" style="display: none;"
+        onclick="fastPickerItemClicked(this);"></div>
+
+    <div id="fast_picker_list_template" class="fast_picker_list" style="display: none;">
+        <span id="fast_picker_list_header" class="fast_picker_list_header"></span>
+    </div>
+    <div id="fast_picker_list_item_template" class="fast_picker_list_item" style="display: none;"
+        onclick="fastPickerItemClicked(this);"></div>
+
+    
+    <script src="{%static 'prs/navbar'%}"></script>
+
+
+
+    <script src="{%static 'prs/select2.full.js'%}"></script>
+    <script src="{%static 'prs/webfont.js'%}"></script>
+    <script src="{%static 'prs/fonts.js'%}"></script>
+
+    <script src="{%static 'prs/jquery.jplayer.min.js'%}"></script>
+    <script src="{%static 'prs/js.cookie.min.js'%}"></script>
+    <script src="{%static 'prs/jquery-ui-1.13.0.min.js'%}"></script>
+    <script src="{%static 'prs/jquery-resizable.js'%}"></script>
+    <script src="{%static 'prs/mobile.js'%}"></script>
+    <script src="{%static 'prs/materialize.min.js'%}"></script>
+
+    <script src="{%static 'prs/video.js'%}"></script>
+    <script src="{%static 'prs/videojs-http-streaming.js'%}"></script>
+
+    <script>
+        const audio = document.getElementById('myAudio');
+        const sources = audio.getElementsByTagName('source');
+        let index = 0;
+
+        // 播放结束事件
+        audio.addEventListener('ended', () => {
+            if (index < sources.length - 1) {
+                // 如果还有下一个音频，则播放下一个
+                index++;
+                audio.src = sources[index].src;
+                audio.play();
+            }
+        });
+
+        audio.addEventListener('click', () => {
+            audio.src = sources[index].src;
+            audio.play();
+        });
+    </script>
+
+</body>
+
+</html>

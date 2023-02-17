@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.db.models import IntegerField
 from django.db.models.functions import Cast
 import datetime as dt
-from datetime import datetime
+from datetime import date
 from django.contrib import messages
 import os
 from django.http import HttpResponseRedirect
@@ -14,57 +14,36 @@ from django.urls import reverse
 import win32clipboard
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+import numpy as np
+import requests
+import re
+import os
+from bs4 import BeautifulSoup
+import json
 # Create your views here.
+
 
 @login_required(login_url='login')
 def setting(request):
-    obj = CustomSetting()
+    obj, created = CustomSetting.objects.get_or_create(user=request.user)
+    start_date = obj.start_date
+    no_sunday = obj.no_sunday
+
     if request.method == 'POST':
-        data = CustomSetting.objects.filter(user=request.user)
         checks = request.POST.getlist('checks[]')
-        init_lang = "한국어"
-        if len(checks) == 1:
-            init_lang = checks[0]
+        obj.lang_1 = checks[0] if checks else "한국어"
+        obj.lang_2 = ','.join(checks[1:]) if len(checks) > 1 else ""
+        obj.bible_plan = request.POST['qt']
+        obj.start_date = start_date
+        obj.no_sunday = no_sunday
+        obj.save()
 
-        if len(checks) == 0 or len(checks) == 1:
-
-            if data.exists():
-                data.delete()
-                select_1 = init_lang
-                obj.user = request.user
-                obj.lang_1 = select_1
-                obj.bible_plan = request.POST['qt']
-                obj.save()
-            else:
-                select_1 = init_lang
-                obj.user = request.user
-                obj.lang_1 = select_1
-                obj.bible_plan = request.POST['qt']
-                obj.save()
-        else:
-            if data.exists():
-                data.delete()
-                select_1 = checks[0]
-                select_2 = ','.join(checks[1:])
-                obj.user = request.user
-                obj.lang_1 = select_1
-                obj.lang_2 = select_2
-                obj.bible_plan = request.POST['qt']
-                obj.save()
-            else:
-                select_1 = checks[0]
-                select_2 = ','.join(checks[1:])
-                obj.user = request.user
-                obj.lang_1 = select_1
-                obj.lang_2 = select_2
-                obj.bible_plan = request.POST['qt']
-                obj.save()
-
-        if select_1 == '영어':
+        if obj.lang_1 == '영어':
             return redirect('bible_esv')
-        elif select_1 == '한국어':
+        elif obj.lang_1 == '한국어':
             return redirect('bible_korean')
-        elif select_1 == '원어':
+        elif obj.lang_1 == '원어':
             return redirect('orig_language')
         else:
             return redirect('bible_chinese')
@@ -72,7 +51,9 @@ def setting(request):
     return render(request, 'setting.html', {})
 
 
+
 '''English Bible ESV Version '''
+
 
 @login_required(login_url='login')
 def Bible_ESV(request):
@@ -143,12 +124,12 @@ def Bible_ESV(request):
             Chapter=chapter,
             Verse_as_int__range=(start_v, end_v)
         )
-    if language_2 == None or '영어'in language_2:
+    if language_2 == None or '영어' in language_2:
         fina_scripture = scripture
     else:
         language_2 = language_2.split(',')
         length = len(language_2)+1
-        data = data = second_lang(request, language_2,book_no)
+        data = data = second_lang(request, language_2, book_no)
         if len(language_2) == 3:
             fina_scripture = zip(scripture, data[0], data[1], data[2])
         elif len(language_2) == 2:
@@ -156,12 +137,12 @@ def Bible_ESV(request):
         else:
             fina_scripture = zip(scripture, data[0])
 
-    if language_1 == '영어'or 'bible_esv' in request.get_full_path():
+    if language_1 == '영어' or 'bible_esv' in request.get_full_path():
         return render(request, 'bible.html', {'scripture': scripture, 'language_1': language_1,
                                               'language_2': language_2,
                                               'daily_verse': daily_verse, 'today': date,
                                               'book_name': book_name, 'f_date': f_date,
-                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
+                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length, 'book_no': int(book_no)})
     else:
         return scripture
 
@@ -169,6 +150,8 @@ def Bible_ESV(request):
 '''
 Chinese Bible Version
 '''
+
+
 @login_required(login_url='login')
 def bible_chinese(request):
     try:
@@ -244,7 +227,7 @@ def bible_chinese(request):
     else:
         language_2 = language_2.split(',')
         length = len(language_2)+1
-        data = data = second_lang(request, language_2,book_no)
+        data = data = second_lang(request, language_2, book_no)
         if len(language_2) == 3:
             fina_scripture = zip(scripture, data[0], data[1], data[2])
         elif len(language_2) == 2:
@@ -257,7 +240,7 @@ def bible_chinese(request):
                                               'language_2': language_2,
                                               'daily_verse': daily_verse, 'today': date,
                                               'book_name': book_name, 'f_date': f_date,
-                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
+                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length, 'book_no': int(book_no)})
     else:
         return scripture
     # return render(request, 'bible.html', {'scripture': scripture,
@@ -270,7 +253,6 @@ def bible_chinese(request):
 
 Koran Bible. 개역한글
 '''
-
 
 
 def bible_korean(request):
@@ -365,7 +347,7 @@ def bible_korean(request):
     else:
         language_2 = language_2.split(',')
         length = len(language_2)+1
-        data = second_lang(request, language_2,book_no)
+        data = second_lang(request, language_2, book_no)
         if data:
             if len(language_2) == 3:
                 fina_scripture = zip(scripture, data[0], data[1], data[2])
@@ -381,12 +363,16 @@ def bible_korean(request):
                                               'language_2': language_2,
                                               'daily_verse': daily_verse, 'today': date,
                                               'book_name': book_name, 'f_date': f_date,
-                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
+                                              'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length, 'book_no': int(book_no)})
     else:
         return scripture
+
+
 '''
 Biblical original languages(Hebrew and Greek)
 '''
+
+
 @login_required(login_url='login')
 def orig_language(request):
     try:
@@ -464,7 +450,7 @@ def orig_language(request):
         else:
             language_2 = language_2.split(',')
             length = len(language_2)+1
-            data = data = second_lang(request, language_2,book_no)
+            data = data = second_lang(request, language_2, book_no)
             if len(language_2) == 3:
                 fina_scripture = zip(scripture, data[0], data[1], data[2])
             elif len(language_2) == 2:
@@ -477,7 +463,7 @@ def orig_language(request):
                                                   'language_2': language_2,
                                                   'daily_verse': daily_verse, 'today': date,
                                                   'book_name': book_name, 'f_date': f_date,
-                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
+                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length, 'book_no': int(book_no)})
         else:
             return scripture
     else:
@@ -523,12 +509,12 @@ def orig_language(request):
                 Chapter=chapter,
                 Verse_as_int__range=(start_v, end_v)
             )
-        if language_2 == None or '원어'in language_2:
+        if language_2 == None or '원어' in language_2:
             fina_scripture = scripture
         else:
             language_2 = language_2.split(',')
             length = len(language_2)+1
-            data = data = second_lang(request, language_2,book_no)
+            data = data = second_lang(request, language_2, book_no)
             if len(language_2) == 3:
                 fina_scripture = zip(scripture, data[0], data[1], data[2])
             elif len(language_2) == 2:
@@ -541,9 +527,10 @@ def orig_language(request):
                                                   'language_2': language_2,
                                                   'daily_verse': daily_verse, 'today': date,
                                                   'book_name': book_name, 'f_date': f_date,
-                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length,'book_no':int(book_no)})
+                                                  'bible_qt': bible_qt, "fina_scripture": fina_scripture, 'length': length, 'book_no': int(book_no)})
         else:
             return scripture
+
 
 def login(request):
     if request.user.is_authenticated:
@@ -557,7 +544,7 @@ def login(request):
                 return redirect('bible_korean')
             elif language == '원어':
                 return redirect('orig_language')
-            elif language=='중국어':
+            elif language == '중국어':
                 return redirect('bible_chinese')
             else:
                 return redirect('setting')
@@ -565,6 +552,7 @@ def login(request):
             return redirect('setting')
     else:
         return render(request, 'login.html', {})
+
 
 @login_required(login_url='login')
 def user_profile(request):
@@ -592,6 +580,7 @@ def user_profile(request):
 '''
     Add a New meditation
 '''
+
 
 @login_required(login_url='login')
 def add_meditaion(request):
@@ -642,6 +631,7 @@ def add_meditaion(request):
     add prayer request
 '''
 
+
 @login_required(login_url='login')
 def prayer(request):
     if request.method == 'POST':
@@ -662,6 +652,7 @@ def prayer(request):
 '''
     show my prayer request
 '''
+
 
 @login_required(login_url='login')
 def my_prayer(request):
@@ -687,6 +678,7 @@ def my_prayer(request):
     show all prayers
 '''
 
+
 @login_required(login_url='login')
 def show_prayer(request):
     today = dt.datetime.today().strftime('%Y-%m-%d')
@@ -711,6 +703,7 @@ def show_prayer(request):
     update my prayer
 '''
 
+
 @login_required(login_url='login')
 def u_prayer(request, id):
     obj = Prayer.objects.get(id=id)
@@ -731,6 +724,7 @@ def u_prayer(request, id):
 '''
     show the user's meditation
 '''
+
 
 @login_required(login_url='login')
 def show_meditation(request, *args, **kwargs):
@@ -786,6 +780,7 @@ def show_meditation(request, *args, **kwargs):
     show personal meditations
 '''
 
+
 @login_required(login_url='login')
 def p_meditation(request):
     today = dt.datetime.today().strftime('%Y-%m-%d')
@@ -808,6 +803,7 @@ def p_meditation(request):
 '''
     upatea personal meditaions
 '''
+
 
 @login_required(login_url='login')
 def u_meditation(request, id):
@@ -954,7 +950,7 @@ def remove(request):
 '''Deal with the second language'''
 
 
-def second_lang(request, lang,book_no):
+def second_lang(request, lang, book_no):
     data = []
     # date = dt.datetime.today().strftime("%Y-%m-%d")
     # daily_bible = bible_plan(request, date)
@@ -967,7 +963,7 @@ def second_lang(request, lang,book_no):
         elif l == '중국어':
             data_2 = bible_chinese(request)
             data.append(data_2)
-        elif l == '원어':            
+        elif l == '원어':
             data_3 = orig_language(request)
             data.append(data_3)
         else:
@@ -991,3 +987,240 @@ def bible_plan(request, date):
     else:
         daily_bible = Daily_Bible.objects.get(Date=date)
     return daily_bible
+
+
+''''
+PRS bible reading plan
+'''
+
+
+def prs_bible(request):
+
+    obj, created = CustomSetting.objects.get_or_create(user=request.user)
+    start_date = obj.start_date
+    no_sunday = obj.no_sunday
+
+    if start_date is None:
+
+        if request.method == 'POST':
+
+            # get the data by custom selected.
+            date_string = request.POST.get('datepicker')
+            sunday_check = request.POST.get('sundayCheck')
+
+            # covert date from '%m/%d/%Y' to  '%Y-%m-%d'
+            date_object = dt.datetime.strptime(date_string, "%m/%d/%Y")
+            new_date_string = date_object.strftime("%Y-%m-%d")
+
+            obj.user = request.user
+            obj.start_date = new_date_string
+            obj.no_sunday = sunday_check == 'true'
+            obj.save(update_fields=['start_date', 'no_sunday'])
+
+            # Calculating the number of days between dates
+            start_date = dt.datetime.strptime(new_date_string, "%Y-%m-%d")
+            today = dt.datetime.strptime(
+                dt.datetime.today().strftime("%Y-%m-%d"), "%Y-%m-%d")
+            dalta = today-start_date
+            num = str(dalta.days)
+
+            # get PRS website's url
+            url = "https://bible.prsi.org/ko/Player/getplaylist?playlistID=ac1fb6b0-158f-4725-8d57-47b730616466&sectionIndex=" + \
+                num+"&presenterMode=false"
+
+            # getting data from PRS website
+            response = requests.get(url, verify=True)
+
+            # coverting data
+            result = response.json()
+            soup = BeautifulSoup(result['HTML'], 'html.parser')
+            
+            # Find the first p tag with class "subheader"
+            subheader = soup.find('p', {'class': 'subheader'})
+
+            # Get the text content of the tag
+            subtitle = subheader.text
+            html = str(soup)
+
+            # From here it will deal with audio for prs bible.
+            # Extract data from td tags
+            td_tags = soup.find_all('td', style='padding-left: 20px')
+            td_list = [td.text for td in td_tags]
+            my_list = [x for x in td_list if "분" not in x]
+            book_list = ["".join(filter(str.isalpha, item)).strip() for item in my_list]
+
+            chapter_list=[]
+            for item in my_list:
+                numbers = re.findall(r'\d+(?:-\d+)?', item)
+                if len(numbers) > 1:
+                    chapter_list.append('-'.join(numbers))
+                else:
+                    chapter_list.append(numbers[0])
+
+
+            # Extract chapter list for OT and NT
+            if '-' in chapter_list[1]:
+                start, end = chapter_list[1].split("-")
+                ot_chapter_list = list(range(int(start), int(end)+1))
+            else:
+                ot_chapter_list = chapter_list[1]
+            
+            if '-' in chapter_list[2]:
+                
+                start, end = chapter_list[2].split("-")
+                nt_chapter_list = list(range(int(start), int(end)+1))
+            else:
+                nt_chapter_list = chapter_list[1]
+                
+
+            Book_num = korean_title.objects.filter(Book__in=book_list).values_list('Book_ID',flat=True)
+            open_url = "https://bible.prsi.org/ko/Player/getaudiomedia?book=19&chapter="+chapter_list[0]+""
+            end_url = "https://bible.prsi.org/ko/Player/getaudiomedia?book=19&chapter="+chapter_list[3]+""
+            OT_url =[]
+            NT_url =[]
+
+
+            for num in Book_num:
+                if num >=40 and num!=19:
+                    for item in nt_chapter_list:
+                        NT_url.append("https://bible.prsi.org/ko/Player/getaudiomedia?book="+str(num)+"&chapter="+str(item)+"")
+                elif num!=19:
+                    for item in ot_chapter_list:
+                        OT_url.append("https://bible.prsi.org/ko/Player/getaudiomedia?book="+str(num)+"&chapter="+str(item)+"")
+
+            # Get audio data from PRS website
+            open_response = requests.get(open_url, verify=True)
+            end_response = requests.get(end_url, verify=True)
+            result_1 = open_response.json()
+            result_2 = end_response.json()
+            open_mp3 = result_1['mp3']
+            end_mp3 =result_2['mp3']
+
+            ot_mp3 =[]
+            nt_mp3 =[]
+
+            for url in OT_url:
+                res = requests.get(url, verify=True)
+                resul = res.json()
+                ot_mp3.append(resul['mp3'])
+            
+            for url in NT_url:
+                res = requests.get(url, verify=True)
+                resul = res.json()
+                nt_mp3.append(resul['mp3'])
+
+
+            return render(request, 'prs_reading.html', {"html": html,"subtitle":subtitle,"open_mp3":open_mp3,"end_mp3":end_mp3,"ot_mp3":ot_mp3,"nt_mp3":nt_mp3})
+
+        else:
+
+            return render(request, 'prs_bible.html', {})
+    else:
+
+        new_date_string = start_date.strftime("%Y-%m-%d")
+        start_date = dt.datetime.strptime(new_date_string, "%Y-%m-%d")
+        today = dt.datetime.strptime(dt.datetime.today().strftime("%Y-%m-%d"), "%Y-%m-%d")
+        delta = today - start_date
+        num = str(delta.days)
+        if no_sunday:
+            num_sun = np.busday_count(new_date_string, today.strftime("%Y-%m-%d"), weekmask='Sun')
+            num = str(delta.days - num_sun)
+
+        # get PRS website's url
+        url = "https://bible.prsi.org/ko/Player/getplaylist?playlistID=ac1fb6b0-158f-4725-8d57-47b730616466&sectionIndex=" + \
+            num+"&presenterMode=false"
+
+        # getting data from PRS website
+        response = requests.get(url, verify=True)
+
+        # coverting data
+        result = response.json()
+        soup = BeautifulSoup(result['HTML'], 'html.parser')
+        html = str(soup)
+        # Find the first p tag with class "subheader"
+        subheader = soup.find('p', {'class': 'subheader'})
+        subtitle = subheader.text
+    
+
+        # From here it will deal with audio for prs bible.
+        # Extract data from td tags
+        td_tags = soup.find_all('td', style='padding-left: 20px')
+        td_list = [td.text for td in td_tags]
+        my_list = [x for x in td_list if "분" not in x]
+        book_list = ["".join(filter(str.isalpha, item)).strip() for item in my_list]
+
+        chapter_list=[]
+        for item in my_list:
+            numbers = re.findall(r'\d+(?:-\d+)?', item)
+            if len(numbers) > 1:
+                chapter_list.append('-'.join(numbers))
+            else:
+                chapter_list.append(numbers[0])
+
+
+        # Extract chapter list for OT and NT
+        if '-' in chapter_list[1]:
+            start, end = chapter_list[1].split("-")
+            ot_chapter_list = list(range(int(start), int(end)+1))
+        else:
+            ot_chapter_list = chapter_list[1]
+        
+        if '-' in chapter_list[2]:
+            
+            start, end = chapter_list[2].split("-")
+            nt_chapter_list = list(range(int(start), int(end)+1))
+        else:
+            nt_chapter_list = chapter_list[1]
+            
+
+        Book_num = korean_title.objects.filter(Book__in=book_list).values_list('Book_ID',flat=True)
+        open_url = "https://bible.prsi.org/ko/Player/getaudiomedia?book=19&chapter="+chapter_list[0]+""
+        end_url = "https://bible.prsi.org/ko/Player/getaudiomedia?book=19&chapter="+chapter_list[3]+""
+        OT_url =[]
+        NT_url =[]
+
+
+        for num in Book_num:
+            if num >=40 and num!=19:
+                for item in nt_chapter_list:
+                    NT_url.append("https://bible.prsi.org/ko/Player/getaudiomedia?book="+str(num)+"&chapter="+str(item)+"")
+            elif num!=19:
+                for item in ot_chapter_list:
+                    OT_url.append("https://bible.prsi.org/ko/Player/getaudiomedia?book="+str(num)+"&chapter="+str(item)+"")
+
+        # Get audio data from PRS website
+        open_response = requests.get(open_url, verify=True)
+        end_response = requests.get(end_url, verify=True)
+        result_1 = open_response.json()
+        result_2 = end_response.json()
+        open_mp3 = result_1['mp3']
+        end_mp3 =result_2['mp3']
+
+        ot_mp3 =[]
+        nt_mp3 =[]
+
+        for url in OT_url:
+            res = requests.get(url, verify=True)
+            resul = res.json()
+            ot_mp3.append(resul['mp3'])
+        
+        for url in NT_url:
+            res = requests.get(url, verify=True)
+            resul = res.json()
+            nt_mp3.append(resul['mp3'])
+
+
+        return render(request, 'prs_reading.html', {"html": html,"subtitle":subtitle,"open_mp3":open_mp3,"end_mp3":end_mp3,"ot_mp3":ot_mp3,"nt_mp3":nt_mp3})
+
+
+'''
+    Reset plan of prs bible
+'''
+def prs_reset(request):
+    obj, created = CustomSetting.objects.get_or_create(user=request.user)
+    obj.start_date = None
+    obj.no_sunday = False
+
+    obj.save()
+    
+    return redirect("prs_bible")

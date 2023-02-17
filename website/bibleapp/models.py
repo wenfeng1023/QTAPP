@@ -285,7 +285,8 @@ class CustomSetting(models.Model):
     lang_1 = models.CharField(max_length=50)
     lang_2 = models.CharField(max_length=100,null=True,blank=True)
     bible_plan = models.CharField(max_length=50)
-    
+    start_date = models.DateTimeField(null=True,blank=True)
+    no_sunday = models.BooleanField(default=False)
     class Meta:
         verbose_name = 'CustomSetting'
 

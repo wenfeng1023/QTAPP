@@ -25,5 +25,7 @@ urlpatterns = [
     path('calendar',views.my_calendar,name='calendar'),
     path('add_event',views.add_event,name='add_event'),
     path('update', views.update, name='update'),
-    path('remove', views.remove, name='remove')
+    path('remove', views.remove, name='remove'),
+    path('prs_bible', views.prs_bible, name='prs_bible'),
+    path('prs_reset', views.prs_reset, name='prs_reset'),
 ]
