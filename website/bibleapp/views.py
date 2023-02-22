@@ -993,7 +993,7 @@ def bible_plan(request, date):
 PRS bible reading plan
 '''
 
-
+@login_required(login_url='login')
 def prs_bible(request):
 
     obj, created = CustomSetting.objects.get_or_create(user=request.user)
