@@ -1009,20 +1009,16 @@ def prs_bible(request):
             sunday_check = request.POST.get('sundayCheck')
 
             # covert date from '%m/%d/%Y' to  '%Y-%m-%d'
-            date_object = dt.datetime.strptime(date_string, "%m/%d/%Y")
-            new_date_string = date_object.strftime("%Y-%m-%d")
+            date_object = dt.datetime.strptime(date_string, "%Y-%m-%d")
+            # new_date_string = date_object.strftime("%Y-%m-%d")
 
             obj.user = request.user
-            obj.start_date = new_date_string
+            obj.start_date = date_string
             obj.no_sunday = sunday_check == 'true'
             obj.save(update_fields=['start_date', 'no_sunday'])
 
-            # Calculating the number of days between dates
-            start_date = dt.datetime.strptime(new_date_string, "%Y-%m-%d")
-            today = dt.datetime.strptime(
-                dt.datetime.today().strftime("%Y-%m-%d"), "%Y-%m-%d")
-            dalta = today-start_date
-            num = str(dalta.days)
+            # get number of date from start date.
+            num = get_date_num(date_object,sunday_check)
 
             # get PRS website's url
             url = "https://bible.prsi.org/ko/Player/getplaylist?playlistID=ac1fb6b0-158f-4725-8d57-47b730616466&sectionIndex=" + \
@@ -1113,22 +1109,16 @@ def prs_bible(request):
             return render(request, 'prs_reading.html', {"html": html,"subtitle":subtitle,"open_mp3":open_mp3,"end_mp3":end_mp3,"ot_mp3":ot_mp3,"nt_mp3":nt_mp3})
 
         else:
+            today = dt.datetime.today()  # 获取今天的日期
+            today_str = today.strftime('%Y-%m-%d')  # 将日期转换为字符串
 
-            return render(request, 'prs_bible.html', {})
+            return render(request, 'prs_bible.html', {'today_str':today_str})
     else:
-
-        new_date_string = start_date.strftime("%Y-%m-%d")
-        start_date = dt.datetime.strptime(new_date_string, "%Y-%m-%d")
-        today = dt.datetime.strptime(dt.datetime.today().strftime("%Y-%m-%d"), "%Y-%m-%d")
-        delta = today - start_date
-        num = str(delta.days)
-        if no_sunday:
-            num_sun = np.busday_count(new_date_string, today.strftime("%Y-%m-%d"), weekmask='Sun')
-            num = str(delta.days - num_sun)
+        # get number of date from start date.
+        num = get_date_num(start_date,no_sunday)
 
         # get PRS website's url
-        url = "https://bible.prsi.org/ko/Player/getplaylist?playlistID=ac1fb6b0-158f-4725-8d57-47b730616466&sectionIndex=" + \
-            num+"&presenterMode=false"
+        url = f"https://bible.prsi.org/ko/Player/getplaylist?playlistID=ac1fb6b0-158f-4725-8d57-47b730616466&sectionIndex={num}&presenterMode=false"
 
         # getting data from PRS website
         response = requests.get(url, verify=True)
@@ -1137,40 +1127,35 @@ def prs_bible(request):
         result = response.json()
         soup = BeautifulSoup(result['HTML'], 'html.parser')
         html = str(soup)
+
         # Find the first p tag with class "subheader"
         subheader = soup.find('p', {'class': 'subheader'})
         subtitle = subheader.text
-    
 
-        # From here it will deal with audio for prs bible.
-        # Extract data from td tags
-        td_tags = soup.find_all('td', style='padding-left: 20px')
-        td_list = [td.text for td in td_tags]
-        my_list = [x for x in td_list if "분" not in x]
-        book_list = ["".join(filter(str.isalpha, item)).strip() for item in my_list]
+        # get list of book and chapter
+        chapter_list,book_list = get_chapter_list(soup)
 
-        chapter_list=[]
-        for item in my_list:
-            numbers = re.findall(r'\d+(?:-\d+)?', item)
-            if len(numbers) > 1:
-                chapter_list.append('-'.join(numbers))
+
+
+
+        # Use try-except block to extract OT and NT chapter lists
+        try:
+            if '-' in chapter_list[1]:
+                start, end = chapter_list[1].split("-")
+                ot_chapter_list = list(range(int(start), int(end)+1))
             else:
-                chapter_list.append(numbers[0])
+                ot_chapter_list = [int(chapter_list[1])]
+        except IndexError:
+            ot_chapter_list = []
 
-
-        # Extract chapter list for OT and NT
-        if '-' in chapter_list[1]:
-            start, end = chapter_list[1].split("-")
-            ot_chapter_list = list(range(int(start), int(end)+1))
-        else:
-            ot_chapter_list = chapter_list[1]
-        
-        if '-' in chapter_list[2]:
-            
-            start, end = chapter_list[2].split("-")
-            nt_chapter_list = list(range(int(start), int(end)+1))
-        else:
-            nt_chapter_list = chapter_list[1]
+        try:
+            if '-' in chapter_list[2]:
+                start, end = chapter_list[2].split("-")
+                nt_chapter_list = list(range(int(start), int(end)+1))
+            else:
+                nt_chapter_list = [int(chapter_list[2])]
+        except IndexError:
+            nt_chapter_list = []
             
 
         Book_num = korean_title.objects.filter(Book__in=book_list).values_list('Book_ID',flat=True)
@@ -1210,12 +1195,44 @@ def prs_bible(request):
             nt_mp3.append(resul['mp3'])
 
 
+
         return render(request, 'prs_reading.html', {"html": html,"subtitle":subtitle,"open_mp3":open_mp3,"end_mp3":end_mp3,"ot_mp3":ot_mp3,"nt_mp3":nt_mp3})
 
+"""
+Returns a string of date from start_date to today (inclusive).
+If no_sunday is True, then Sundays will be excluded from the list.
+"""
+def get_date_num(start_date: dt.datetime, no_sunday: bool = False):
+    
+    new_date_string = start_date.strftime("%Y-%m-%d")
+    start_date = dt.datetime.strptime(new_date_string, "%Y-%m-%d")
+    today = dt.datetime.strptime(dt.datetime.today().strftime("%Y-%m-%d"), "%Y-%m-%d")
+    delta = today - start_date
+    num = str(delta.days)
+    if no_sunday:
+        num_sun = np.busday_count(new_date_string, today.strftime("%Y-%m-%d"), weekmask='Sun')
+        num = str(delta.days - num_sun)
+    return num
 
-'''
+"""
+    Given an HTML string, returns a list of chapter numbers extracted from td tags with style 'padding-left: 20px'.
+"""
+def get_chapter_list(soup):
+
+    # Extract data from td tags
+    td_list = [td.text for td in soup.find_all('td', style='padding-left: 20px')]
+    book_list = ["".join(filter(str.isalpha, item)).strip() for item in td_list if "분" not in item]
+    
+    # Use re.findall() method with regex to extract chapter numbers
+    chapter_list=[]
+    for item in td_list:
+        numbers = re.findall(r'\d+(?:-\d+)?', item)
+        chapter_list.append('-'.join(numbers) if len(numbers) > 1 else numbers[0])
+    return chapter_list,book_list
+
+"""
     Reset plan of prs bible
-'''
+"""
 def prs_reset(request):
     obj, created = CustomSetting.objects.get_or_create(user=request.user)
     obj.start_date = None

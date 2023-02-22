@@ -21,7 +21,7 @@
 
     <form action="#" method='POST'>
         {% csrf_token %}
-        <p>시작일자: <input type="text" id="datepicker" name='datepicker'readonly>
+        <p>시작일자: <input type="text" id="datepicker" value = "{{today_str}}"name='datepicker'readonly>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="true" id="sundayCheck" name='sundayCheck'>
                 <label class="form-check-label" for="sundayCheck">
@@ -36,10 +36,14 @@
 <script type="text/javascript">
     $( function() {
         $( "#datepicker" ).datepicker({
+            dateFormat: 'yy-mm-dd',
             minDate: "-3w",
             maxDate: new Date()
+            
         });
       } );
+
+
 </script>
 
 
