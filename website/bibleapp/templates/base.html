@@ -84,24 +84,37 @@
             margin: 0;
         }
 
-        #loading-message {
+        #loading-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
             display: none;
+        }
+
+        #loading-box {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 20px;
+            z-index: 1000;
+            display: none;
+        }
+
+        #loading-message {
+            padding: 10px 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            z-index: 9999;
-          }
-          
+        }
     </style>
 </head>
 
 <body>
-    <!--Loading page-->
-    <div id="loading-message">Loading Please wait...</div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
     </script>
@@ -146,7 +159,12 @@
                         </div>
                         <div class="offcanvas-body small">
                             {%if user.is_authenticated%}
-
+                            <!--Loading page-->
+                            <div id="loading-mask"></div>
+                            <div id="loading-box">
+                                <div id="loading-message">页面正在加载，请稍候...</div>
+                            </div>
+                            <!--Loading page-->
                             <img src="{{user.user_profile.profile_img.url}}"
                                 class="avatar rounded-circle">{{user.username}}
 
@@ -220,19 +238,40 @@
 
     </div>
     <script>
-// 获取页面加载中的提示元素
-const loadingMessage = document.getElementById('loading-message');
+        const link = document.getElementById('myLink');
+        const loadingMask = document.getElementById('loading-mask');
+        const loadingBox = document.getElementById('loading-box');
 
-// 在页面加载之前显示提示信息
-window.addEventListener('beforeunload', function() {
-  loadingMessage.style.display = 'block';
-});
+        link.addEventListener('click', function (e) {
+            e.preventDefault(); // 阻止链接的默认跳转行为
 
-// 在页面加载之后隐藏提示信息
-window.addEventListener('load', function() {
-  loadingMessage.style.display = 'none';
-});
+            loadingMask.style.display = 'block'; // 显示遮罩层
+            loadingBox.style.display = 'block'; // 显示提示框
 
+            window.location.href = this.href; // 跳转到链接的目标页面
+        });
+
+        window.addEventListener('load', function () {
+            loadingMask.style.display = 'none'; // 隐藏遮罩层
+            loadingBox.style.display = 'none'; // 隐藏提示框
+        });
+
+        window.addEventListener('popstate', function (event) {
+            // 检查是否为后退操作
+            if (event.state && event.state.isBack) {
+                // 不显示加载信息
+                loadingMask.style.display = 'none';
+                loadingBox.style.display = 'none';
+            }
+        });
+
+        // 在加载新页面之前设置状态信息，以便后退时检查是否为后退操作
+        link.addEventListener('click', function (e) {
+            const stateObj = {
+                isBack: true
+            };
+            history.pushState(stateObj, '', window.location.href);
+        });
     </script>
 </body>
 
