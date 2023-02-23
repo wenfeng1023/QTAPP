@@ -144,16 +144,8 @@
                 <div class="media_controls_wrapper">
 
                     <audio id="myAudio" controls>
-                        <source src="{{open_mp3}}" type="audio/mpeg">
-                        {% for ot_mp3 in ot_mp3%}
-                        <source src="{{ot_mp3}}" type="audio/mpeg">
-                        {%endfor%}
-                        {%for nt_mp3 in nt_mp3%}
-                        <source src="{{nt_mp3}}" type="audio/mpeg">
-                        {%endfor%}
-
-                        <source src="{{end_mp3}}" type="audio/mpeg">
-                        Your browser does not support the audio element.
+                        <source src="{{mp3_url}}" type="audio/mpeg">
+                    
                     </audio>
 
                     <!--

@@ -6,8 +6,7 @@ from django.db.models import Q
 from django.db.models import IntegerField
 from django.db.models.functions import Cast
 import datetime as dt
-from datetime import date
-from django.contrib import messages
+from django.conf import settings
 import os
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -21,6 +20,7 @@ import re
 import os
 from bs4 import BeautifulSoup
 import json
+from django.utils import timezone
 # Create your views here.
 
 
@@ -999,6 +999,8 @@ def prs_bible(request):
     obj, created = CustomSetting.objects.get_or_create(user=request.user)
     start_date = obj.start_date
     no_sunday = obj.no_sunday
+    # 用当前时间创建一个带有时区信息的datetime对象
+    now = timezone.now()
 
     if start_date is None:
 
@@ -1013,7 +1015,7 @@ def prs_bible(request):
             # new_date_string = date_object.strftime("%Y-%m-%d")
 
             obj.user = request.user
-            obj.start_date = date_string
+            obj.start_date = timezone.make_aware(dt.datetime.strptime(date_string,'%Y-%m-%d'),timezone.get_current_timezone())
             obj.no_sunday = sunday_check == 'true'
             obj.save(update_fields=['start_date', 'no_sunday'])
 
@@ -1036,77 +1038,18 @@ def prs_bible(request):
 
             # Get the text content of the tag
             subtitle = subheader.text
+
+            subtitle_num = (re.search(r'\d+', subtitle)).group(0)
+            mp3_url=''
+
+            if subtitle_num:
+
+                media_url = settings.MEDIA_URL
+                mp3_url = media_url + f'prs_mp3/{subtitle_num}.mp3'
+
             html = str(soup)
 
-            # From here it will deal with audio for prs bible.
-            # Extract data from td tags
-            td_tags = soup.find_all('td', style='padding-left: 20px')
-            td_list = [td.text for td in td_tags]
-            my_list = [x for x in td_list if "분" not in x]
-            book_list = ["".join(filter(str.isalpha, item)).strip() for item in my_list]
-
-            chapter_list=[]
-            for item in my_list:
-                numbers = re.findall(r'\d+(?:-\d+)?', item)
-                if len(numbers) > 1:
-                    chapter_list.append('-'.join(numbers))
-                else:
-                    chapter_list.append(numbers[0])
-
-
-            # Extract chapter list for OT and NT
-            if '-' in chapter_list[1]:
-                start, end = chapter_list[1].split("-")
-                ot_chapter_list = list(range(int(start), int(end)+1))
-            else:
-                ot_chapter_list = chapter_list[1]
-            
-            if '-' in chapter_list[2]:
-                
-                start, end = chapter_list[2].split("-")
-                nt_chapter_list = list(range(int(start), int(end)+1))
-            else:
-                nt_chapter_list = chapter_list[1]
-                
-
-            Book_num = korean_title.objects.filter(Book__in=book_list).values_list('Book_ID',flat=True)
-            open_url = "https://bible.prsi.org/ko/Player/getaudiomedia?book=19&chapter="+chapter_list[0]+""
-            end_url = "https://bible.prsi.org/ko/Player/getaudiomedia?book=19&chapter="+chapter_list[3]+""
-            OT_url =[]
-            NT_url =[]
-
-
-            for num in Book_num:
-                if num >=40 and num!=19:
-                    for item in nt_chapter_list:
-                        NT_url.append("https://bible.prsi.org/ko/Player/getaudiomedia?book="+str(num)+"&chapter="+str(item)+"")
-                elif num!=19:
-                    for item in ot_chapter_list:
-                        OT_url.append("https://bible.prsi.org/ko/Player/getaudiomedia?book="+str(num)+"&chapter="+str(item)+"")
-
-            # Get audio data from PRS website
-            open_response = requests.get(open_url, verify=True)
-            end_response = requests.get(end_url, verify=True)
-            result_1 = open_response.json()
-            result_2 = end_response.json()
-            open_mp3 = result_1['mp3']
-            end_mp3 =result_2['mp3']
-
-            ot_mp3 =[]
-            nt_mp3 =[]
-
-            for url in OT_url:
-                res = requests.get(url, verify=True)
-                resul = res.json()
-                ot_mp3.append(resul['mp3'])
-            
-            for url in NT_url:
-                res = requests.get(url, verify=True)
-                resul = res.json()
-                nt_mp3.append(resul['mp3'])
-
-
-            return render(request, 'prs_reading.html', {"html": html,"subtitle":subtitle,"open_mp3":open_mp3,"end_mp3":end_mp3,"ot_mp3":ot_mp3,"nt_mp3":nt_mp3})
+            return render(request, 'prs_reading.html', {"html": html,"subtitle":subtitle,"mp3_url":mp3_url})
 
         else:
             today = dt.datetime.today()  # 获取今天的日期
@@ -1131,72 +1074,15 @@ def prs_bible(request):
         # Find the first p tag with class "subheader"
         subheader = soup.find('p', {'class': 'subheader'})
         subtitle = subheader.text
+        subtitle_num = (re.search(r'\d+', subtitle)).group(0)
+        mp3_url=''
 
-        # get list of book and chapter
-        chapter_list,book_list = get_chapter_list(soup)
+        if subtitle_num:
 
+            media_url = settings.MEDIA_URL
+            mp3_url = media_url + f'prs_mp3/{subtitle_num}.mp3'
 
-
-
-        # Use try-except block to extract OT and NT chapter lists
-        try:
-            if '-' in chapter_list[1]:
-                start, end = chapter_list[1].split("-")
-                ot_chapter_list = list(range(int(start), int(end)+1))
-            else:
-                ot_chapter_list = [int(chapter_list[1])]
-        except IndexError:
-            ot_chapter_list = []
-
-        try:
-            if '-' in chapter_list[2]:
-                start, end = chapter_list[2].split("-")
-                nt_chapter_list = list(range(int(start), int(end)+1))
-            else:
-                nt_chapter_list = [int(chapter_list[2])]
-        except IndexError:
-            nt_chapter_list = []
-            
-
-        Book_num = korean_title.objects.filter(Book__in=book_list).values_list('Book_ID',flat=True)
-        open_url = "https://bible.prsi.org/ko/Player/getaudiomedia?book=19&chapter="+chapter_list[0]+""
-        end_url = "https://bible.prsi.org/ko/Player/getaudiomedia?book=19&chapter="+chapter_list[3]+""
-        OT_url =[]
-        NT_url =[]
-
-
-        for num in Book_num:
-            if num >=40 and num!=19:
-                for item in nt_chapter_list:
-                    NT_url.append("https://bible.prsi.org/ko/Player/getaudiomedia?book="+str(num)+"&chapter="+str(item)+"")
-            elif num!=19:
-                for item in ot_chapter_list:
-                    OT_url.append("https://bible.prsi.org/ko/Player/getaudiomedia?book="+str(num)+"&chapter="+str(item)+"")
-
-        # Get audio data from PRS website
-        open_response = requests.get(open_url, verify=True)
-        end_response = requests.get(end_url, verify=True)
-        result_1 = open_response.json()
-        result_2 = end_response.json()
-        open_mp3 = result_1['mp3']
-        end_mp3 =result_2['mp3']
-
-        ot_mp3 =[]
-        nt_mp3 =[]
-
-        for url in OT_url:
-            res = requests.get(url, verify=True)
-            resul = res.json()
-            ot_mp3.append(resul['mp3'])
-        
-        for url in NT_url:
-            res = requests.get(url, verify=True)
-            resul = res.json()
-            nt_mp3.append(resul['mp3'])
-
-
-
-        return render(request, 'prs_reading.html', {"html": html,"subtitle":subtitle,"open_mp3":open_mp3,"end_mp3":end_mp3,"ot_mp3":ot_mp3,"nt_mp3":nt_mp3})
+        return render(request, 'prs_reading.html', {"html": html,"subtitle":subtitle,'mp3_url':mp3_url})
 
 """
 Returns a string of date from start_date to today (inclusive).
@@ -1214,21 +1100,7 @@ def get_date_num(start_date: dt.datetime, no_sunday: bool = False):
         num = str(delta.days - num_sun)
     return num
 
-"""
-    Given an HTML string, returns a list of chapter numbers extracted from td tags with style 'padding-left: 20px'.
-"""
-def get_chapter_list(soup):
 
-    # Extract data from td tags
-    td_list = [td.text for td in soup.find_all('td', style='padding-left: 20px')]
-    book_list = ["".join(filter(str.isalpha, item)).strip() for item in td_list if "분" not in item]
-    
-    # Use re.findall() method with regex to extract chapter numbers
-    chapter_list=[]
-    for item in td_list:
-        numbers = re.findall(r'\d+(?:-\d+)?', item)
-        chapter_list.append('-'.join(numbers) if len(numbers) > 1 else numbers[0])
-    return chapter_list,book_list
 
 """
     Reset plan of prs bible
