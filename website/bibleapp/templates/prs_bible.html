@@ -12,71 +12,92 @@
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <style>
-    ul>li {
-        display: inline-block;
-        /* You can also add some margins here to make it look prettier */
-    }
-
-   #loading {
-
-        display: none;
-        position: fixed;
-        z-index: 9999;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        text-align: center;
-        padding-top: 50px;
-        font-size: 30px;
+  ul>li {
+    display: inline-block;
+    /* You can also add some margins here to make it look prettier */
+  }
 
 
-    }
+  #loading-mask-1 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+  }
+
+  #loading-box-1 {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    display: none;
+  }
+
+  #loading-message-1 {
+    padding: 10px 20px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
 </style>
 
 <div class="modal-body p-5 pt-0 d-flex justify-content-center">
-    
-    <form id="myForm" action="#" method='POST'>
-        {% csrf_token %}
 
-        <p>시작일자: <input type="text" id="datepicker" value="{{today_str}}" name='datepicker' readonly>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="true" id="sundayCheck" name='sundayCheck'>
-                <label class="form-check-label" for="sundayCheck">
-                    일요일을 하지 않음
-                </label>
+  <form id="myForm" action="{%url 'prs_bible'%}" method='POST'>
+    {% csrf_token %}
 
-            </div>
-        </p>
-        <div id="loading">Loading...Please waiting</div>
-        <button id='myLink_1' type="submit"> 시작</button>
-    </form>
-    
-    <br>
+    <p>시작일자: <input type="text" id="datepicker" value="{{today_str}}" name='datepicker' readonly>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="true" id="sundayCheck" name='sundayCheck'>
+        <label class="form-check-label" for="sundayCheck">
+          일요일을 하지 않음
+        </label>
+
+      </div>
+    </p>
+    <!--Loading page-->
+    <div id="loading-mask-1"></div>
+    <div id="loading-box-1">
+      <div id="loading-message-1">Loading...Please waiting</div>
+    </div>
+    <!--Loading page-->
+    <button id='myLink_1' type="submit"> 시작</button>
+  </form>
+
+  <br>
 </div>
 
 <script type="text/javascript">
-    $(function () {
-        $("#datepicker").datepicker({
-            dateFormat: 'yy-mm-dd',
-            minDate: "-3w",
-            maxDate: new Date()
+  $(function () {
+    $("#datepicker").datepicker({
+      dateFormat: 'yy-mm-dd',
+      minDate: "-3w",
+      maxDate: new Date()
 
-        });
     });
+  });
 </script>
 
 <script>
-    document.getElementById("myLink_1").addEventListener("click", function () {
-        document.getElementById("loading").style.display = "block";
-        document.getElementById("myForm").submit();
-    });
-    document.getElementById("myLink_1").addEventListener("click", function () {
-        document.getElementById("loading").style.display = "block";
-        document.getElementById("myForm").submit();
-    });
+  document.getElementById("myLink_1").addEventListener("click", function() {
+    document.getElementById("loading-mask-1").style.display = "block";
+    document.getElementById('loading-box-1').style.display= "block";
+    document.getElementById("loading-message-1").style.display = "block";
+    document.getElementById("myForm").submit();
+  });
+  window.addEventListener("load", function() {
+    document.getElementById("loading-mask-1").style.display = "none";
+    document.getElementById('loading-box-1').style.display= "none";
+    document.getElementById("loading-message-1").style.display = "none";
+  });
+  
+  
+        
 </script>
 
 {%endblock%}
