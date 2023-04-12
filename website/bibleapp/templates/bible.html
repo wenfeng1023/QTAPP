@@ -196,16 +196,27 @@ input:checked + .slider:before {
         
         <h5 class="fw-bold mb-0">{{today}} {{book_name}} {{daily_verse}}
             <input id='ur1' type='hidden' value="https://neoqt.neowine.com">
-            {%if bible_qt == '생명의삶'%}
-            <a href="http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4" target="_blank">
-                <img src="{% static 'img/icons8-link-16.png'%}">
-            </a>
-            {%else%}
-            <a href="https://meditation.su.or.kr/meditation_mp3/2023/20{{f_date}}.mp3" target="_blank">
-                <img src="{% static 'img/icons8-link-16.png'%}">
-            </a>
-            {%endif%}
+            
         </h5>
+        {%if bible_qt == '생명의삶'%}
+           <!-- <a href="http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4" target="_blank">
+                <img src="{% static 'img/icons8-link-16.png'%}">
+            </a>-->
+            <video controls width="400" height="300" style="margin-bottom: 20px;">
+                <source src="http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            {%else%}
+            <!--<a href="https://meditation.su.or.kr/meditation_mp3/2023/20{{f_date}}.mp3" target="_blank">
+                <img src="{% static 'img/icons8-link-16.png'%}">
+            </a>-->
+            <div style = "margin-top: 20px; text-align: center;">
+            <audio id="myAudio" controls controlslist="nodownload" style="transform: scaleY(0.8) scaleX(0.8);">
+                <source src="https://meditation.su.or.kr/meditation_mp3/2023/20{{f_date}}.mp3" type="audio/mpeg">
+            
+            </audio>
+        </div>
+            {%endif%}
         <br>
         <!--To know how many language selected-->
         {%if length == 4 %}
