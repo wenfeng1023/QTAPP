@@ -22,7 +22,6 @@
 <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
 
 <style>
-
     .main-content {
         direction: rtl;
         /* Right to Left */
@@ -43,7 +42,7 @@
     }
 
     @import url(http://fonts.googleapis.com/earlyaccess/alefhebrew.css);
-    
+
 
     :root {
         --primary-color: #302AE6;
@@ -52,7 +51,7 @@
         --bg-color: #fff;
         --heading-color: #292922;
     }
-      
+
     [data-theme="dark"] {
         --primary-color: #9A97F3;
         --secondary-color: #818cab;
@@ -64,97 +63,128 @@
     div {
         background-color: var(--bg-color);
         color: var(--font-color);
-    
+
         /*other styles*/
         .....
     }
-    
+
     h1 {
         color: var(--secondary-color);
-    
+
         /*other styles*/
         .....
     }
-    
+
     a {
         color: var(--primary-color);
-    
+
         /*other styles*/
         .....
     }
+
     i {
         color: var(--secondary-color);
-    
+
         /*other styles*/
         .....
     }
 
     /*Simple css to style it like a toggle switch*/
-.theme-switch-wrapper {
-  display: flex;
-  align-items: center;
+    .theme-switch-wrapper {
+        display: flex;
+        align-items: center;
 
-  em {
-    margin-left: 10px;
-    font-size: 1rem;
-  }
-}
-.theme-switch {
-  display: inline-block;
-  height: 34px;
-  position: relative;
-  width: 60px;
-}
+        em {
+            margin-left: 10px;
+            font-size: 1rem;
+        }
+    }
 
-.theme-switch input {
-  display:none;
+    .theme-switch {
+        display: inline-block;
+        height: 34px;
+        position: relative;
+        width: 60px;
+    }
 
-}
+    .theme-switch input {
+        display: none;
 
-.slider {
-  background-color: #ccc;
-  bottom: 0;
-  cursor: pointer;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  transition: .4s;
-}
+    }
 
-.slider:before {
-  background-color: #fff;
-  bottom: 4px;
-  content: "";
-  height: 26px;
-  left: 4px;
-  position: absolute;
-  transition: .4s;
-  width: 26px;
-}
+    .slider {
+        background-color: #ccc;
+        bottom: 0;
+        cursor: pointer;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        transition: .4s;
+    }
 
-input:checked + .slider {
-  background-color: #66bb6a;
-}
+    .slider:before {
+        background-color: #fff;
+        bottom: 4px;
+        content: "";
+        height: 26px;
+        left: 4px;
+        position: absolute;
+        transition: .4s;
+        width: 26px;
+    }
 
-input:checked + .slider:before {
-  transform: translateX(26px);
-}
+    input:checked+.slider {
+        background-color: #66bb6a;
+    }
 
-.slider.round {
-  border-radius: 34px;
-}
+    input:checked+.slider:before {
+        transform: translateX(26px);
+    }
 
-.slider.round:before {
-  border-radius: 50%;
-}
+    .slider.round {
+        border-radius: 34px;
+    }
 
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    .video-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .play-icon {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        background-image: url('/static/img/play.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+    }
+
+    #player {
+        display: block;
+        width: 100%;
+        height: auto;
+        position: relative;
+        z-index: 0;
+    }
 </style>
-<div class="modal-header p-5 pb-4 border-bottom-0">
+<h2 class="fw-bold mb-0" style=" display: block;
+text-align: center;
+margin: 0 auto;">오늘말씀</h2>
+<div class="modal-header p-5 pb-4 border-bottom-0 ">
     <!-- <h5 class="modal-title">Modal title</h5> -->
-    <h2 class="fw-bold mb-0">오늘말씀</h2>
-    
-    <form action="#" method='POST'>
+
+
+    <form action="#" method='POST' class="d-flex align-items-center">
         {% csrf_token %}
 
         <button class='button button1' id="prev" style="border:none"><img src="{%static 'img/left-arrow.png'%}"
@@ -172,106 +202,115 @@ input:checked + .slider:before {
         Copy
     </button>
     <p class="result"></p>
+
 </div>
 
 <div class="modal-body p-5 pt-0">
-    
-   
 
 
 
-<div class="theme-switch-wrapper">
-    <a href="javascript:SetFont(27)" style ="color: black;text-decoration: none;|font-size: xx-large;"><i class="bi bi-fonts"style="font-size: 27px;"></i></a> 
-    <a href="javascript:SetFont(18)"style ="color: black;text-decoration: none;|font-size: xx-large;"><i class="bi bi-fonts"style="font-size: 18px;"></i></a> 
-    <a href="javascript:SetFont(14)"style ="color: black;text-decoration: none;|font-size: xx-large;"><i class="bi bi-fonts"style="font-size: 14px;"></i></a>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <label class="theme-switch" for="checkbox">
-        <input type="checkbox" id="checkbox" />
-        <div class="slider round"></div>
-  </label>
-  <em>야간 모드</em>
-</div>
-          
+
+
+    <div class="theme-switch-wrapper">
+        <a href="javascript:SetFont(27)" style="color: black;text-decoration: none;|font-size: xx-large;"><i
+                class="bi bi-fonts" style="font-size: 27px;"></i></a>
+        <a href="javascript:SetFont(18)" style="color: black;text-decoration: none;|font-size: xx-large;"><i
+                class="bi bi-fonts" style="font-size: 18px;"></i></a>
+        <a href="javascript:SetFont(14)" style="color: black;text-decoration: none;|font-size: xx-large;"><i
+                class="bi bi-fonts" style="font-size: 14px;"></i></a>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="slider round"></div>
+        </label>
+        <em>야간 모드</em>
+    </div>
+
     <div id='editor1' class="form-floating mb-3">
-        
+
         <h5 class="fw-bold mb-0">{{today}} {{book_name}} {{daily_verse}}
             <input id='ur1' type='hidden' value="https://neoqt.neowine.com">
-            
+
         </h5>
         {%if bible_qt == '생명의삶'%}
-           <!-- <a href="http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4" target="_blank">
-                <img src="{% static 'img/icons8-link-16.png'%}">
-            </a>-->
-            <video controls width="400" height="300" style="margin-bottom: 20px;">
+        <div class='video-container'>
+            <a href="http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4" target="_blank">
+                <!--<img src="{% static 'img/icons8-link-16.png'%}">-->
+                <img id="player" src="https://www.duranno.com/qt/img/video1.jpg" alt="생명의삶 영상보기">
+                <span class="play-icon"></span>
+
+            </a>
+        </div>
+        <!-- <video controls width="300" height="300" style="margin-bottom: 20px;">
                 <source src="http://cloudvod1.cgntv.net/_NewMP4/1/MAQT{{f_date}}.h854x480.mp4" type="video/mp4">
                 Your browser does not support the video tag.
-              </video>
-            {%else%}
-            <!--<a href="https://meditation.su.or.kr/meditation_mp3/2023/20{{f_date}}.mp3" target="_blank">
+              </video>-->
+        {%else%}
+        <!--<a href="https://meditation.su.or.kr/meditation_mp3/2023/20{{f_date}}.mp3" target="_blank">
                 <img src="{% static 'img/icons8-link-16.png'%}">
             </a>-->
-            <div style = "margin-top: 20px; text-align: center;">
+        <div style="margin-top: 20px; text-align: center;">
             <audio id="myAudio" controls controlslist="nodownload" style="transform: scaleY(0.8) scaleX(0.8);">
                 <source src="https://meditation.su.or.kr/meditation_mp3/2023/20{{f_date}}.mp3" type="audio/mpeg">
-            
+
             </audio>
         </div>
-            {%endif%}
+        {%endif%}
         <br>
         <!--To know how many language selected-->
         {%if length == 4 %}
         {%for text1,text2,text3,text4 in fina_scripture%}
-            <!--Setting Hebrew fonts if include Hebrew Bible-->
-            {%if book_no < 40%}
-            <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
-            <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
-            <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
-            <p class='ezra'>{{text4.Text}}</p>
-            <br>
-            {%else%}
-            <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
-            <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
-            <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
-            <p><sup>{{text4.Verse}}</sup>{{text4.Text}}</p>
-            <br>
-            {%endif%}
+        <!--Setting Hebrew fonts if include Hebrew Bible-->
+        {%if book_no < 40%}
+        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+        <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
+        <p class='ezra'>{{text4.Text}}</p>
+        <br>
+        {%else%}
+        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+        <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
+        <p><sup>{{text4.Verse}}</sup>{{text4.Text}}</p>
+        <br>
+        {%endif%}
         {% endfor %}
 
         {%elif length == 3%}
         {%for text1,text2,text3 in fina_scripture%}
-            {%if  book_no < 40%}
-            <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
-            <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
-            <p class='ezra'>{{text3.Text}}</p>
-            <br>
-            {%else%}
-            <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
-            <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
-            <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
-            <br>
-            {% endif %}
+        {%if  book_no < 40%}
+        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+        <p class='ezra'>{{text3.Text}}</p>
+        <br>
+        {%else%}
+        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+        <p><sup>{{text3.Verse}}</sup>{{text3.Text}}</p>
+        <br>
+        {% endif %}
         {% endfor %}
 
         {%elif length == 2%}
         {%for text1,text2 in fina_scripture%}
-            {%if book_no < 40%}
-            <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
-            <p class='ezra'><strong>{{text2.Text}}</strong></p>
+        {%if book_no < 40%}
+        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+        <p class='ezra'><strong>{{text2.Text}}</strong></p>
 
-            {%else%}
-            <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
-            <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
+        {%else%}
+        <p><sup>{{text1.Verse}}</sup><strong>{{text1.Text}}</strong></p>
+        <p><sup>{{text2.Verse}}</sup>{{text2.Text}}</p>
 
-            {%endif%}
+        {%endif%}
         {% endfor %}
 
         {%else%}
         {%for text in fina_scripture%}
-            {%if book_no < 40%}
-            <p class='ezra'><strong>{{text.Text}}</strong></p>
-            {%else%}
-            <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
-            {%endif%}
+        {%if book_no < 40%}
+        <p class='ezra'><strong>{{text.Text}}</strong></p>
+        {%else%}
+        <p><sup>{{text.Verse}}</sup><strong>{{text.Text}}</strong></p>
+        {%endif%}
         {%endfor%}
         {%endif%}
     </div>
@@ -353,39 +392,36 @@ input:checked + .slider:before {
 </script>
 <!--change background color-->
 <script>
-    
-const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+    const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
 
-function switchTheme(e) {
-    if (e.target.checked) {
-        document.documentElement.setAttribute('data-theme', 'dark');
+    function switchTheme(e) {
+        if (e.target.checked) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
     }
-    else {
-        document.documentElement.setAttribute('data-theme', 'light');
-    }    
-}
 
-toggleSwitch.addEventListener('change', switchTheme, false);
-function switchTheme(e) {
-    if (e.target.checked) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark'); //add this
+    toggleSwitch.addEventListener('change', switchTheme, false);
+
+    function switchTheme(e) {
+        if (e.target.checked) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark'); //add this
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light'); //add this
+        }
     }
-    else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        localStorage.setItem('theme', 'light'); //add this
-    }    
-}
-const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+    const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
 
-if (currentTheme) {
-    document.documentElement.setAttribute('data-theme', currentTheme);
+    if (currentTheme) {
+        document.documentElement.setAttribute('data-theme', currentTheme);
 
-    if (currentTheme === 'dark') {
-        toggleSwitch.checked = true;
+        if (currentTheme === 'dark') {
+            toggleSwitch.checked = true;
+        }
     }
-}
-
 </script>
 <!--share-->
 <!--
@@ -490,6 +526,6 @@ if (currentTheme) {
     }
 </script>
 <script>
-    
+
 </script>
 {%endblock%}
